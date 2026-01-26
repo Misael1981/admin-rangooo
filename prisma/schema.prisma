@@ -1,0 +1,496 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===============================================
+// Usuários (Clientes e Entregadores)
+// ===============================================
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  phone         String?
+  password      String?   @map("hashed_password")
+  address       Json?     
+  role          Role      @default(CLIENT) // CLIENTE, RESTAURANT_OWNER, DELIVERY_PERSON, ADMIN
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relação com Pedidos
+  orders Order[]
+
+  // Relação com Restaurante (para donos de restaurante)
+  restaurants Restaurant[]
+  restaurantRoles RestaurantUser[]
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ===============================================
+// Lead Application (Aplicação de Lead)
+// ===============================================
+
+model LeadApplication {
+  id             String     @id @default(cuid())
+  name           String
+  email          String
+  phone          String
+  restaurantName String
+  city           String
+  state          String
+  notes          String?
+  status         LeadStatus @default(PENDING)
+  approvedAt     DateTime?
+  approvedBy     String?    // admin user id
+
+  invites        EnrollmentInvite[]
+
+  createdAt      DateTime   @default(now())
+  @@index([status, createdAt])
+  @@unique([email, status]) // evita múltiplos PENDING por email
+}
+
+enum InviteStatus {
+  PENDING
+  USED
+  EXPIRED
+}
+
+model EnrollmentInvite {
+  id         String       @id @default(cuid())
+  leadId     String
+  email      String
+  token      String       @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  status     InviteStatus @default(PENDING)
+
+  lead       LeadApplication @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime     @default(now())
+
+  @@index([status, expiresAt])
+}
+
+
+
+// ===============================================
+// Restaurantes (Parceiro)
+// ===============================================
+
+model Restaurant {
+  id             String  @id @default(uuid())
+  ownerId        String 
+  name           String
+  slug           String  @unique 
+  description    String?
+  avatarImageUrl String? // imagem de logo
+  coverImageUrl  String? // imagem de capa
+
+  // CAMPO DE CATEGORIA PARA FILTRAR
+  category RestaurantCategory @default(RESTAURANT)
+
+  latitude  Decimal
+  longitude Decimal
+  address   String // Lembrar de tirar esse campo quando eu apagar o seed
+
+  street         String?
+  number         String?
+  complement     String?
+  neighborhood   String?
+  city           String?
+  state          String?            @db.VarChar(2)
+  zipCode        String?
+  deliveryFee    Float?
+
+  // Contatos
+  contacts    ContactNumber[]
+  socialMedia Json? 
+  email       String?
+
+  // Paleta de cores da marca (array JSON de strings HEX/HSL)
+  brandColors Json?
+  isOpen Boolean @default(true) // Aberto ou Fechado
+
+  // Configuração de impressão
+  printingToken String?  @unique  // Token único para autenticação do agent
+  printerStatus String?  @default("disconnected")
+  lastPrintedAt DateTime?
+  agentVersion  String?
+  printerType   String?  // "xprinter", "bematech", etc
+  printerConfig Json?    // Configurações específicas {interface: "USB001", type: "EPSON"}
+
+  // Relações
+  owner                 User                   @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  products              Product[]
+  menuCategories        MenuCategory[]
+  orders                Order[]
+  businessHours         BusinessHours[]
+  paymentMethods        RestaurantPaymentMethod[]
+  consumptionMethods    RestaurantConsumptionMethod[]
+  users                 RestaurantUser[]
+
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+
+  @@index([ownerId])
+}
+
+// ===============================================
+// Tabela para vincular usuários a restaurantes com permissões específicas
+// ===============================================
+
+model RestaurantUser {
+  id           String   @id @default(uuid())
+  userId       String
+  restaurantId String
+  role         RestaurantRole @default(MANAGER) // OWNER, MANAGER, EMPLOYEE, VIEWER
+  
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade) 
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, restaurantId])
+  @@index([restaurantId])
+}
+
+// ===============================================
+// Métodos de Consumo
+// ===============================================
+
+model RestaurantConsumptionMethod {
+  id           String            @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  method       ConsumptionMethod
+  isActive     Boolean           @default(true)
+  displayOrder Int               @default(0)
+
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@unique([restaurantId, method])
+  @@index([restaurantId, isActive])
+}
+
+// ===============================================
+// Contatos do Restaurante
+// ===============================================
+model ContactNumber {
+  id           String     @id @default(cuid())
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId String
+
+  type      ContactType
+  number    String
+  label     String?
+  isPrimary Boolean     @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([restaurantId, type])
+}
+
+// ===============================================
+// Horários de Funcionamento
+// ===============================================
+
+model BusinessHours {
+  id           String   @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  
+  // Dia da semana (0 = Domingo, 1 = Segunda, ..., 6 = Sábado)
+  dayOfWeek    Int     // 0-6 (Domingo-Sábado)
+  
+  // Horários de abertura/fechamento (pode ter múltiplos períodos por dia)
+  timeSlots    Json     // Array de { open: "HH:MM", close: "HH:MM", type: "LUNCH" | "DINNER" | "BREAKFAST" }
+  
+  // Se o estabelecimento está fechado neste dia
+  isClosed     Boolean  @default(false)
+  
+  // Ordem para exibição (opcional)
+  displayOrder Int      @default(0)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([restaurantId, dayOfWeek])
+  @@index([restaurantId, dayOfWeek])
+}
+
+// ===============================================
+// Métodos de Pagamento do Estabelecimento
+// ===============================================
+
+model RestaurantPaymentMethod {
+  id           String  @id @default(cuid())
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  
+  // Método principal (Dinheiro, PIX, Cartão)
+  method       PaymentMethod
+  
+  // Para cartões: quais bandeiras são aceitas
+  cardBrands   CardBrand[] // Array de bandeiras aceitas
+  
+  // Configurações específicas
+  isActive     Boolean @default(true)
+  description  String? // Ex: "PIX - Chave: 11999999999"
+  
+  // Ordem de exibição
+  displayOrder Int     @default(0)
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([restaurantId, method])
+  @@index([restaurantId, isActive])
+}
+
+// ===============================================
+// Categorias de Cardápio
+// ===============================================
+model MenuCategory {
+  id                     String                  @id @default(uuid())
+  name                   String
+  displayOrder           Int                     @default(0)
+  restaurant             Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  restaurantId           String
+  products               Product[]
+  additionalIngredients  AdditionalIngredient[]
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+}
+
+// ===============================================
+// Produtos (Itens do Cardápio)
+// ===============================================
+model Product {
+  id           String   @id @default(uuid())
+  restaurantId String
+  name         String
+  description  String?
+  price        Decimal  @db.Decimal(6, 2) 
+  imageUrl     String? // URL da imagem do produto
+  ingredients  String[] // Lista de ingredientes (ex: ["100g de carne", "2 tomates", "cebola"])
+
+  // Categorias (ex: Hamburguer, Pizza, Sobremesa)
+  menuCategoryId String
+  menuCategory   MenuCategory @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
+
+  // Relações
+  restaurant          Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  orderItems          OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ===============================================
+// Ingredientes Adicionais (Extras)
+// ===============================================
+model AdditionalIngredient {
+  id             String      @id @default(cuid())
+  menuCategoryId String      @map("menu_category_id")
+  name           String
+  price          Decimal     @db.Decimal(6, 2)
+  isActive       Boolean     @default(true)
+
+  menuCategory   MenuCategory @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([menuCategoryId, name])
+  @@index([menuCategoryId])
+}
+
+
+// ===============================================
+// 4. Pedidos (Transação Principal)
+// ===============================================
+
+model Order {
+  id                String            @id @default(uuid())
+  userId            String 
+  restaurantId      String
+  printId           String?           // Para o controle do WebSocket
+  orderNumber       Int?
+  totalAmount       Decimal           @db.Decimal(10, 2) // Valor total do pedido (incluindo frete)
+  deliveryFee       Decimal           @db.Decimal(6, 2) // Valor do frete
+  status            OrderStatus       @default(PENDING) // Status do pedido
+  consumptionMethod ConsumptionMethod @default(DELIVERY) // Método de consumo (delivery ou pickup)
+  customName        String?
+  extras            String?
+  deliveryAddress   Json? // Endereço de entrega atual do pedido
+
+  // Relações
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  items      OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ===============================================
+// 5. Itens do Pedido (Detalhes)
+// ===============================================
+
+model OrderItem {
+  id        String @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  customName   String?
+  extras       String?
+  // Preço do item no momento da compra (para histórico)
+  priceAtOrder Decimal @db.Decimal(6, 2)
+  
+  // Relações
+  additionalIngredients Json?
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ===============================================
+// ENUMS DE APOIO
+// ===============================================
+
+// Enum para Status da Aplicação de Lead
+enum LeadStatus {
+  PENDING // Pendente (acabou de ser feito)
+  APPROVED // Aprovado
+  REJECTED // Rejeitado
+}
+
+
+
+// Enum para Categorias de Restaurantes
+enum RestaurantCategory {
+  RESTAURANT // Restaurantes genéricos (Comida Brasileira, Japonesa, etc)
+  PIZZARIA
+  HAMBURGUERIA
+  SORVETERIA
+  ACAI
+  SAUDAVEL
+  DOCES
+}
+
+// Enum para Nível de Usuário
+enum Role {
+  CLIENT
+  RESTAURANT_OWNER
+  DELIVERY_PERSON
+  ADMIN
+}
+
+// Enum para Status do Pedido
+enum OrderStatus {
+  PENDING // Pendente (acabou de ser feito)
+  CONFIRMED // Confirmado pelo Restaurante
+  PREPARING // Em preparação
+  READY_FOR_PICKUP // Pronto para retirada (pelo entregador)
+  OUT_FOR_DELIVERY // A caminho
+  DELIVERED // Entregue
+  CANCELED // Cancelado
+}
+
+// Enum para Método de Consumo
+enum ConsumptionMethod {
+  DELIVERY // Entrega
+  PICKUP // Retirada no local pickup
+  DINE_IN // Consumo no local dine-in
+}
+
+enum ContactType {
+  PHONE
+  WHATSAPP
+}
+
+enum PaymentMethod {
+  CASH       
+  PIX       
+  CREDIT_CARD 
+  DEBIT_CARD  
+  MEAL_VOUCHER 
+  FOOD_VOUCHER 
+  ONLINE      
+}
+
+enum CardBrand {
+  VISA
+  MASTERCARD
+  ELO
+  AMERICAN_EXPRESS
+  HIPERCARD
+  DINERS_CLUB
+  DISCOVER
+  AURA
+}
+
+enum RestaurantRole {
+  OWNER     // Dono principal (único ou múltiplos?)
+  MANAGER   // Gerente do estabelecimento
+  EMPLOYEE  // Funcionário comum
+  VIEWER    // Apenas visualização
+}
