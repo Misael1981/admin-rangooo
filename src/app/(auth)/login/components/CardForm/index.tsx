@@ -2,25 +2,41 @@
 
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const CardForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
   const handleLoginWithGoogleClick = async () => {
     setIsLoading(true);
     try {
-      await signIn("google", { callbackUrl: "/" });
+      await signIn("google", { redirect: false });
     } catch (error) {
-      console.error("Erro ao fazer login com Google:", error);
-      toast.error(
-        "Erro ao fazer login com Google. Por favor, tente novamente.",
-      );
+      toast.error("Erro ao fazer login");
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      if (session.user.role === "ADMIN") {
+        router.push("/rangooo");
+      } else if (
+        session.user.role === "RESTAURANT_OWNER" &&
+        session.user.slug
+      ) {
+        router.push(`/${session.user.slug}`);
+      }
+    }
+  }, [session, status, router]);
+
   return (
     <section className="flex flex-col gap-6 justify-between w-full">
       <div className="space-y-1">
