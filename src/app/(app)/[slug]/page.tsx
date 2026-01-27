@@ -3,6 +3,8 @@ import { db } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 
+import StatusOpenSwitch from "@/components/StatusOpenSwitch";
+import CardForHeader from "./components/CardForHeader";
 interface RestaurantPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -24,15 +26,20 @@ export default async function Establishment({ params }: RestaurantPageProps) {
   }
   return (
     <div className="px-8">
-      <div className="mb-8 flex flex-wrap items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Dashboard Administrativo - {restaurant.name}
-          </h1>
-          <p className="text-gray-600">Olá, {session.user.name}</p>
-          <p className="text-gray-600">Gerencie seus pedidos e usuários</p>
+      <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <CardForHeader
+          restaurantName={restaurant.name}
+          userName={session.user.name}
+        />
+
+        <div className="flex items-start md:items-center justify-center">
+          <StatusOpenSwitch
+            initialIsOpen={restaurant.isOpen}
+            restaurantId={restaurant.id}
+            restaurantSlug={slug}
+          />
         </div>
-      </div>
+      </header>
     </div>
   );
 }
