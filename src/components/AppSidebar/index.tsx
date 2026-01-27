@@ -1,4 +1,16 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+"use client";
+
+import {
+  Calendar,
+  Home,
+  Inbox,
+  Printer,
+  Search,
+  Settings,
+  ShoppingBasket,
+  Users,
+  Warehouse,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -6,55 +18,114 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
-];
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export function AppSidebar() {
+  const pathname = usePathname();
+
+  const isAdminRoute = pathname.startsWith("/rangooo");
+
+  const segments = pathname.split("/");
+  const slug = !isAdminRoute ? segments[1] : null;
+
+  const linksEstablishments = [
+    {
+      title: "Dashboard Administrativo",
+      url: `/${slug}`,
+      icon: Home,
+    },
+    {
+      title: "Gerenciar Pedidos",
+      url: `/${slug}/pedidos`,
+      icon: Inbox,
+    },
+    {
+      title: "Dados do Estabelecimento",
+      url: `/${slug}/establishment`,
+      icon: Warehouse,
+    },
+    {
+      title: "Gerenciar Cardápio",
+      url: `/${slug}/products`,
+      icon: ShoppingBasket,
+    },
+    {
+      title: "Gerenciar Usuários",
+      url: `/${slug}/users`,
+      icon: Users,
+    },
+    {
+      title: "Status de Impressão",
+      url: `/${slug}/printing-status`,
+      icon: Printer,
+    },
+  ];
+
+  const linksRangooo = [
+    {
+      title: "Home",
+      url: "/admin-rangooo",
+      icon: Home,
+    },
+    {
+      title: "Gerenciar Estabelecimentos",
+      url: "/admin/rangooo/establishments",
+      icon: Inbox,
+    },
+    {
+      title: "Calendar",
+      url: "#",
+      icon: Calendar,
+    },
+    {
+      title: "Search",
+      url: "#",
+      icon: Search,
+    },
+    {
+      title: "Settings",
+      url: "#",
+      icon: Settings,
+    },
+  ];
+
+  const activeLinks = isAdminRoute ? linksRangooo : linksEstablishments;
+
   return (
     <Sidebar>
+      <SidebarHeader>
+        <div className="relative w-full h-52 p-4 border-2 shadow-lg border-red-500 rounded-lg bg-white">
+          <Image
+            src="/logo-rangooo.png"
+            alt="Logo Rangooo"
+            fill
+            className="object-contain p-4"
+          />
+        </div>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>
+            {isAdminRoute ? "Painel Admin" : "Gerenciamento"}
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
+              {/* Agora percorremos a lista correta */}
+              {activeLinks.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                  <SidebarMenuButton asChild isActive={pathname === item.url}>
+                    {/* Use Link em vez de <a> para não dar refresh na página */}
+                    <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

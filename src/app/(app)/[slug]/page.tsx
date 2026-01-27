@@ -23,13 +23,16 @@ export default async function Establishment({ params }: RestaurantPageProps) {
     redirect("/login");
   }
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold">
-        Bem-vindo ao painel: <span className="text-blue-500">{slug}</span>
-      </h1>
-      <p className="text-muted-foreground">
-        Usuário logado: {session.user?.email}
-      </p>
+    <div className="px-8">
+      <div className="mb-8 flex flex-wrap items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Dashboard Administrativo - {restaurant.name}
+          </h1>
+          <p className="text-gray-600">Olá, {session.user.name}</p>
+          <p className="text-gray-600">Gerencie seus pedidos e usuários</p>
+        </div>
+      </div>
     </div>
   );
 }
