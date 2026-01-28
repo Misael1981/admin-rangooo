@@ -327,10 +327,9 @@ model Product {
   name         String
   description  String?
   price        Decimal  @db.Decimal(6, 2) 
-  imageUrl     String? // URL da imagem do produto
-  ingredients  String[] // Lista de ingredientes (ex: ["100g de carne", "2 tomates", "cebola"])
+  imageUrl     String? 
+  ingredients  String[] 
 
-  // Categorias (ex: Hamburguer, Pizza, Sobremesa)
   menuCategoryId String
   menuCategory   MenuCategory @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
 
@@ -372,15 +371,14 @@ model Order {
   restaurantId      String
   printId           String?           // Para o controle do WebSocket
   orderNumber       Int?
-  totalAmount       Decimal           @db.Decimal(10, 2) // Valor total do pedido (incluindo frete)
-  deliveryFee       Decimal           @db.Decimal(6, 2) // Valor do frete
-  status            OrderStatus       @default(PENDING) // Status do pedido
-  consumptionMethod ConsumptionMethod @default(DELIVERY) // Método de consumo (delivery ou pickup)
+  totalAmount       Decimal           @db.Decimal(10, 2) 
+  deliveryFee       Decimal           @db.Decimal(6, 2) 
+  status            OrderStatus       @default(PENDING) 
+  consumptionMethod ConsumptionMethod @default(DELIVERY) 
   customName        String?
   extras            String?
-  deliveryAddress   Json? // Endereço de entrega atual do pedido
+  deliveryAddress   Json? 
 
-  // Relações
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   items      OrderItem[]
@@ -400,7 +398,6 @@ model OrderItem {
   quantity  Int
   customName   String?
   extras       String?
-  // Preço do item no momento da compra (para histórico)
   priceAtOrder Decimal @db.Decimal(6, 2)
   
   // Relações
@@ -416,18 +413,14 @@ model OrderItem {
 // ENUMS DE APOIO
 // ===============================================
 
-// Enum para Status da Aplicação de Lead
 enum LeadStatus {
-  PENDING // Pendente (acabou de ser feito)
-  APPROVED // Aprovado
-  REJECTED // Rejeitado
+  PENDING 
+  APPROVED 
+  REJECTED 
 }
 
-
-
-// Enum para Categorias de Restaurantes
 enum RestaurantCategory {
-  RESTAURANT // Restaurantes genéricos (Comida Brasileira, Japonesa, etc)
+  RESTAURANT
   PIZZARIA
   HAMBURGUERIA
   SORVETERIA
@@ -444,21 +437,19 @@ enum Role {
   ADMIN
 }
 
-// Enum para Status do Pedido
 enum OrderStatus {
-  PENDING // Pendente (acabou de ser feito)
-  CONFIRMED // Confirmado pelo Restaurante
-  PREPARING // Em preparação
-  READY_FOR_PICKUP // Pronto para retirada (pelo entregador)
-  OUT_FOR_DELIVERY // A caminho
-  DELIVERED // Entregue
-  CANCELED // Cancelado
+  PENDING 
+  CONFIRMED 
+  PREPARING 
+  READY_FOR_PICKUP 
+  OUT_FOR_DELIVERY 
+  DELIVERED 
+  CANCELED 
 }
 
-// Enum para Método de Consumo
 enum ConsumptionMethod {
-  DELIVERY // Entrega
-  PICKUP // Retirada no local pickup
+  DELIVERY 
+  PICKUP 
   DINE_IN // Consumo no local dine-in
 }
 
@@ -489,8 +480,8 @@ enum CardBrand {
 }
 
 enum RestaurantRole {
-  OWNER     // Dono principal (único ou múltiplos?)
-  MANAGER   // Gerente do estabelecimento
-  EMPLOYEE  // Funcionário comum
-  VIEWER    // Apenas visualização
+  OWNER    
+  MANAGER  
+  EMPLOYEE  
+  VIEWER    
 }
