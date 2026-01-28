@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Sun, Moon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { toggleEstablishmentStatus } from "@/app/_actions/toggle-establishment-status";
 
 interface StatusOpenSwitchProps {
   initialIsOpen: boolean;
@@ -25,31 +26,23 @@ const StatusOpenSwitch = ({
 
   const handleToggle = async (newStatus: boolean) => {
     setIsUpdating(true);
-    // Otimismo na UI: muda antes de voltar do servidor
     setIsOpen(newStatus);
 
     try {
-      const response = await fetch(`/api/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: restaurantId,
-          isOpen: newStatus,
-          slug: restaurantSlug,
-        }),
-      });
+      const result = await toggleEstablishmentStatus(
+        restaurantId,
+        newStatus,
+        restaurantSlug,
+      );
+      if (result?.error) throw new Error(result.error);
 
-      if (!response.ok) throw new Error();
-
-      toast.success(newStatus ? "Loja Aberta" : "Loja Fechada");
-
-      window.dispatchEvent(
-        new CustomEvent("restaurant-status-changed", {
-          detail: { isOpen: newStatus },
-        }),
+      toast.success(
+        newStatus
+          ? "Estabelecimento aberto com sucesso!"
+          : "Estabelecimento fechado com sucesso!",
       );
     } catch (error) {
-      toast.error("Erro ao atualizar status");
+      toast.error("Erro ao atualizar status. Tente novamente.");
       setIsOpen(!newStatus);
       console.error(error);
     } finally {

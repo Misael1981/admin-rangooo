@@ -15,6 +15,10 @@ export default async function Establishment({ params }: RestaurantPageProps) {
   const { slug } = await params;
   const session = await getServerSession(authOptions);
 
+  if (!session?.user) {
+    redirect("/login");
+  }
+
   const today = new Date();
 
   const restaurant = await db.restaurant.findUnique({
@@ -47,9 +51,6 @@ export default async function Establishment({ params }: RestaurantPageProps) {
     return notFound();
   }
 
-  if (!session?.user) {
-    redirect("/login");
-  }
   return (
     <div className="px-8 space-y-8 pb-8">
       {/* Header */}

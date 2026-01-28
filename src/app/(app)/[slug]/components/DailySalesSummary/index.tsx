@@ -13,22 +13,19 @@ import { Button } from "@/components/ui/button";
 import { Decimal } from "@prisma/client/runtime/library";
 import { formatCurrency } from "@/helpers/format-currency";
 
-// 1. Defina como é UM pedido (conforme o seu select do Prisma)
 interface Order {
   id: string;
   status: string;
-  totalAmount: Decimal; // ou Decimal, dependendo do seu schema
+  totalAmount: Decimal;
   consumptionMethod: "DELIVERY" | "PICKUP" | "DINE_IN" | string;
   createdAt: Date;
 }
 
-// 2. Defina que as Props do componente recebem uma lista (Array) de Orders
 interface DailySalesSummaryProps {
   todayOrders: Order[];
 }
 
 const DailySalesSummary = ({ todayOrders }: DailySalesSummaryProps) => {
-  // Aqui entra aquela lógica de cálculo que conversamos:
   const deliveryOrders = todayOrders.filter(
     (o) => o.consumptionMethod === "DELIVERY",
   );
@@ -39,20 +36,23 @@ const DailySalesSummary = ({ todayOrders }: DailySalesSummaryProps) => {
     (o) => o.consumptionMethod === "DINE_IN",
   );
 
-  // const deliveryTotal = deliveryOrders.reduce(
-  //   (acc, o) => acc + Number(o.totalAmount),
-  //   0,
-  // );
-  // const pickupTotal = pickupOrders.reduce(
-  //   (acc, o) => acc + Number(o.totalAmount),
-  //   0,
-  // );
-  // const dineInTotal = dineInOrders.reduce(
-  //   (acc, o) => acc + Number(o.totalAmount),
-  //   0,
-  // );
+  const totalRevenue = todayOrders.reduce(
+    (acc, o) => acc + Number(o.totalAmount),
+    0,
+  );
 
-  const total = todayOrders.reduce((acc, o) => acc + Number(o.totalAmount), 0);
+  const deliveryValue = deliveryOrders.reduce(
+    (acc, o) => acc + Number(o.totalAmount),
+    0,
+  );
+  const pickupValue = pickupOrders.reduce(
+    (acc, o) => acc + Number(o.totalAmount),
+    0,
+  );
+  const dineInValue = dineInOrders.reduce(
+    (acc, o) => acc + Number(o.totalAmount),
+    0,
+  );
 
   return (
     <section className="space-y-6">
@@ -68,7 +68,7 @@ const DailySalesSummary = ({ todayOrders }: DailySalesSummaryProps) => {
       <div className="flex flex-wrap items-center justify-center gap-2">
         <MetricCard
           title="Faturamento Total"
-          value={formatCurrency(Number(total))}
+          value={formatCurrency(Number(totalRevenue))}
           description="em relação a ontem"
           icon={DollarSign}
         />
@@ -109,8 +109,18 @@ const DailySalesSummary = ({ todayOrders }: DailySalesSummaryProps) => {
       </div>
 
       <DailySummaryCard
-        delivery={{ count: 25, value: 2500 }}
-        pickup={{ count: 17, value: 1700 }}
+        delivery={{
+          count: deliveryOrders.length,
+          value: deliveryValue,
+        }}
+        pickup={{
+          count: pickupOrders.length,
+          value: pickupValue,
+        }}
+        dineIn={{
+          count: dineInOrders.length,
+          value: dineInValue,
+        }}
       />
 
       <div className="flex justify-end">
