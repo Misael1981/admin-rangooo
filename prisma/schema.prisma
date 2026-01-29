@@ -135,10 +135,9 @@ model Restaurant {
   name           String
   slug           String  @unique 
   description    String?
-  avatarImageUrl String? // imagem de logo
-  coverImageUrl  String? // imagem de capa
+  avatarImageUrl String? 
+  coverImageUrl  String? 
 
-  // CAMPO DE CATEGORIA PARA FILTRAR
   category RestaurantCategory @default(RESTAURANT)
 
   latitude  Decimal
@@ -152,24 +151,22 @@ model Restaurant {
   city           String?
   state          String?            @db.VarChar(2)
   zipCode        String?
-  deliveryFee    Float?
+  deliveryFee    Decimal?            @db.Decimal(6, 2) 
 
-  // Contatos
   contacts    ContactNumber[]
   socialMedia Json? 
   email       String?
 
-  // Paleta de cores da marca (array JSON de strings HEX/HSL)
   brandColors Json?
-  isOpen Boolean @default(true) // Aberto ou Fechado
+  isOpen Boolean @default(true) 
 
   // Configuração de impressão
-  printingToken String?  @unique  // Token único para autenticação do agent
+  printingToken String?  @unique  
   printerStatus String?  @default("disconnected")
   lastPrintedAt DateTime?
   agentVersion  String?
-  printerType   String?  // "xprinter", "bematech", etc
-  printerConfig Json?    // Configurações específicas {interface: "USB001", type: "EPSON"}
+  printerType   String?  
+  printerConfig Json?    
 
   // Relações
   owner                 User                   @relation(fields: [ownerId], references: [id], onDelete: Restrict)
@@ -372,7 +369,7 @@ model Order {
   printId           String?           // Para o controle do WebSocket
   orderNumber       Int?
   totalAmount       Decimal           @db.Decimal(10, 2) 
-  deliveryFee       Decimal           @db.Decimal(6, 2) 
+  deliveryFee       Decimal           @db.Decimal(6,2) @default(0)
   status            OrderStatus       @default(PENDING) 
   consumptionMethod ConsumptionMethod @default(DELIVERY) 
   customName        String?

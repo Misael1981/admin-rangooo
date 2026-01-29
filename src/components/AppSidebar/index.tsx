@@ -75,8 +75,8 @@ export function AppSidebar() {
       icon: Home,
     },
     {
-      title: "Gerenciar Estabelecimentos",
-      url: "/admin/rangooo/establishments",
+      title: "Gerenciar Pedidos",
+      url: `${slug}/pedidos}`,
       icon: Inbox,
     },
     {
