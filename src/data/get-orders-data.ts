@@ -1,6 +1,7 @@
 import { db } from "@/lib/prisma";
+import { ConsumptionMethod } from "@prisma/client";
 
-export async function getOrdersData(slug: string) {
+export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
   const restaurant = await db.restaurant.findUnique({
     where: { slug },
     select: {
@@ -29,6 +30,7 @@ export async function getOrdersData(slug: string) {
   const orders = await db.order.findMany({
     where: {
       restaurantId: restaurant.id,
+      consumptionMethod: method,
       createdAt: {
         gte: startOfShift,
         lt: endOfShift,

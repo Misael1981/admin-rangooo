@@ -6,23 +6,34 @@ import {
   PAYMENT_METHODS,
   type PaymentMethodValue,
 } from "@/helpers/methods-restaurant-options";
-import { PaymentMethod } from "@prisma/client";
+import { ConsumptionMethod, PaymentMethod } from "@prisma/client";
+import FilterConsumptionMethods from "./components/FilterConsumptionMethods";
 
 interface OrdersPageProps {
   params: Promise<{
     slug: string;
   }>;
+  searchParams: Promise<{ consumptionMethod?: string }>;
 }
 
 const allowedPaymentMethods = new Set<PaymentMethod>(
   PAYMENT_METHODS.map((m) => m.value),
 );
 
-export default async function OrdersPage({ params }: OrdersPageProps) {
+export default async function OrdersPage({
+  params,
+  searchParams,
+}: OrdersPageProps) {
   const { slug } = await params;
+  const sParams = await searchParams;
 
-  const data = await getOrdersData(slug);
+  const methodFilter = Object.values(ConsumptionMethod).includes(
+    sParams.consumptionMethod as ConsumptionMethod,
+  )
+    ? (sParams.consumptionMethod as ConsumptionMethod)
+    : undefined;
 
+  const data = await getOrdersData(slug, methodFilter);
   if (!data || !data.restaurant) {
     return notFound();
   }
@@ -44,6 +55,10 @@ export default async function OrdersPage({ params }: OrdersPageProps) {
           )}
         restaurantId={restaurant.id}
         deliveryFee={restaurant.deliveryFee}
+      />
+
+      <FilterConsumptionMethods
+        consumptionMethods={restaurant.consumptionMethods}
       />
     </div>
   );
