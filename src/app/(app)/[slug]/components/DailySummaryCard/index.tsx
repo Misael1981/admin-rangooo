@@ -17,7 +17,7 @@ const DailySummaryCard = ({ delivery, pickup, dineIn }: DailySummaryProps) => {
   const totalCount = delivery.count + pickup.count + dineIn.count;
 
   return (
-    <Card className="border-none shadow-sm bg-white">
+    <Card className="border-none shadow-lg bg-white">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-slate-500 flex items-center gap-2">
           <Calculator className="h-4 w-4" />

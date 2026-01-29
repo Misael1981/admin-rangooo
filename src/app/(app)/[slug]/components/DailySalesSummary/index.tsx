@@ -9,7 +9,6 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import DailySummaryCard from "../DailySummaryCard";
-import { Button } from "@/components/ui/button";
 import { Decimal } from "@prisma/client/runtime/library";
 import { formatCurrency } from "@/helpers/format-currency";
 
@@ -122,10 +121,6 @@ const DailySalesSummary = ({ todayOrders }: DailySalesSummaryProps) => {
           value: dineInValue,
         }}
       />
-
-      <div className="flex justify-end">
-        <Button className="text-lg cursor-pointer p-4">Salvar</Button>
-      </div>
     </section>
   );
 };

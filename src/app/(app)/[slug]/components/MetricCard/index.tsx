@@ -21,7 +21,7 @@ const MetricCard = ({
   trend,
 }: MetricCardProps) => {
   return (
-    <Card className="border-none shadow-sm bg-white overflow-hidden gap-0 min-w-60">
+    <Card className="border-none shadow-lg bg-white overflow-hidden gap-0 min-w-60">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-xs font-bold uppercase tracking-wider text-slate-500">
           {title}
