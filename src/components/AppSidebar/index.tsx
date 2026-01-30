@@ -47,8 +47,8 @@ export function AppSidebar() {
       icon: Inbox,
     },
     {
-      title: "Dados do Estabelecimento",
-      url: `/${slug}/establishment`,
+      title: "Perfil do Estabelecimento",
+      url: `/${slug}/perfil`,
       icon: Warehouse,
     },
     {
@@ -80,7 +80,11 @@ export function AppSidebar() {
       icon: Inbox,
     },
     {
-      title: "Calendar",
+      title: "Perfil do Estabelecimento",
+      url: `/${slug}/perfil`,
+      icon: Warehouse,
+    },
+    {
       url: "#",
       icon: Calendar,
     },

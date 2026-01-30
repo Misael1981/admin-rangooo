@@ -89,7 +89,7 @@ export default async function OrdersPage({
   }));
 
   return (
-    <div className="space-y-6 p-8">
+    <div className="space-y-6 px-8 pb-8">
       <HeaderOrdersPage totalOrders={orders.length} />
 
       <ConsumptionAndPaymentMethodsForm
