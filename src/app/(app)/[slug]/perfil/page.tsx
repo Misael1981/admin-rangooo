@@ -2,6 +2,7 @@ import { db } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import GeneralInformation from "./components/GeneralInformation";
 import HeaderPerfil from "./components/HeaderPerfil";
+import EstablishmentContacts from "./components/EstablishmentContacts";
 
 export default async function PerfilPage({
   params,
@@ -40,6 +41,8 @@ export default async function PerfilPage({
     return notFound();
   }
 
+  console.log(restaurant.contacts);
+
   return (
     <div className="space-y-6 px-8 pb-8">
       <HeaderPerfil />
@@ -49,6 +52,11 @@ export default async function PerfilPage({
         slug={restaurant.slug}
         category={restaurant.category}
         id={restaurant.id}
+      />
+
+      <EstablishmentContacts
+        restaurantId={restaurant.id}
+        initialContacts={restaurant.contacts}
       />
     </div>
   );
