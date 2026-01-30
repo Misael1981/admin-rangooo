@@ -8,6 +8,42 @@ import {
 } from "@/helpers/methods-restaurant-options";
 import { ConsumptionMethod, PaymentMethod } from "@prisma/client";
 import FilterConsumptionMethods from "./components/FilterConsumptionMethods";
+import CardOrder from "./components/CardOrder";
+import { Prisma } from "@prisma/client";
+
+type OrderAddress = {
+  street: string;
+  number: string;
+  city: string;
+  state: string;
+  neighborhood?: string;
+};
+
+function parseAddress(address: Prisma.JsonValue | null): OrderAddress | null {
+  if (!address || typeof address !== "object" || Array.isArray(address)) {
+    return null;
+  }
+
+  const a = address as Record<string, unknown>;
+
+  if (
+    typeof a.street === "string" &&
+    typeof a.number === "string" &&
+    typeof a.city === "string" &&
+    typeof a.state === "string"
+  ) {
+    return {
+      street: a.street,
+      number: a.number,
+      city: a.city,
+      state: a.state,
+      neighborhood:
+        typeof a.neighborhood === "string" ? a.neighborhood : undefined,
+    };
+  }
+
+  return null;
+}
 
 interface OrdersPageProps {
   params: Promise<{
@@ -40,6 +76,18 @@ export default async function OrdersPage({
 
   const { restaurant, orders } = data;
 
+  const normalizedOrders = orders.map((order) => ({
+    id: order.id,
+    customerName: order.customerName,
+    customerPhone: order.customerPhone,
+    totalAmount: Number(order.totalAmount),
+    status: order.status,
+    method: order.method,
+    createdAt: order.createdAt,
+    address: parseAddress(order.address),
+    items: order.items,
+  }));
+
   return (
     <div className="space-y-6 p-8">
       <HeaderOrdersPage totalOrders={orders.length} />
@@ -60,6 +108,12 @@ export default async function OrdersPage({
       <FilterConsumptionMethods
         consumptionMethods={restaurant.consumptionMethods}
       />
+
+      <section className="flex flex-col items-center justify-center gap-4">
+        {normalizedOrders.map((order) => (
+          <CardOrder key={order.id} order={order} />
+        ))}
+      </section>
     </div>
   );
 }

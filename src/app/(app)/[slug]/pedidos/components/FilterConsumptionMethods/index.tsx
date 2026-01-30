@@ -51,7 +51,7 @@ const FilterConsumptionMethods = ({
         <Button
           variant={active === null ? "default" : "outline"}
           size="sm"
-          className="rounded-full"
+          className="rounded-full cursor-pointer"
           onClick={() => handleFilterChange(null)}
         >
           Todos
@@ -62,7 +62,7 @@ const FilterConsumptionMethods = ({
             key={method}
             variant={active === method ? "default" : "outline"}
             size="sm"
-            className="rounded-full"
+            className="rounded-full cursor-pointer"
             onClick={() => handleFilterChange(method)}
           >
             {LABELS[method] || method}
