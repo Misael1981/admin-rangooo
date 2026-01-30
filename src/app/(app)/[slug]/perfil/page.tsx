@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import GeneralInformation from "./components/GeneralInformation";
 import HeaderPerfil from "./components/HeaderPerfil";
 import EstablishmentContacts from "./components/EstablishmentContacts";
+import SocialMediaEstablishment from "./components/SocialMediaEstablishment";
+import EstablishmentAddress from "./components/EstablishmentAddress";
 
 export default async function PerfilPage({
   params,
@@ -27,6 +29,7 @@ export default async function PerfilPage({
       neighborhood: true,
       city: true,
       state: true,
+      zipCode: true,
       contacts: { select: { type: true, number: true, isPrimary: true } },
       description: true,
       businessHours: {
@@ -40,8 +43,6 @@ export default async function PerfilPage({
   if (!restaurant) {
     return notFound();
   }
-
-  console.log(restaurant.contacts);
 
   return (
     <div className="space-y-6 px-8 pb-8">
@@ -57,6 +58,26 @@ export default async function PerfilPage({
       <EstablishmentContacts
         restaurantId={restaurant.id}
         initialContacts={restaurant.contacts}
+      />
+
+      <SocialMediaEstablishment
+        initialSocialMedia={restaurant.socialMedia}
+        initialEmail={restaurant.email || ""}
+        restaurantId={restaurant.id}
+      />
+
+      <EstablishmentAddress
+        restaurantId={restaurant.id}
+        initialData={{
+          street: restaurant.street ?? "",
+          number: restaurant.number ?? "",
+          neighborhood: restaurant.neighborhood ?? "",
+          complement: restaurant.complement ?? "",
+          city: restaurant.city ?? "",
+          state: restaurant.state ?? "",
+          zipCode: restaurant.zipCode ?? "",
+          country: "Brasil",
+        }}
       />
     </div>
   );
