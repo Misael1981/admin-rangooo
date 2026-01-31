@@ -5,12 +5,85 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import MenuTableCard from "../MenuTableCard";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import {
+  createCategory,
+  deleteCategory,
+} from "@/app/_actions/menu/create-category";
+import { toast } from "sonner";
+import { useRef } from "react";
 
-const MenuCategoriesList = () => {
+type CategorySummary = {
+  id: string;
+  name: string;
+  productsCount: number;
+};
+
+type Props = {
+  categories: CategorySummary[];
+  onSelect: (id: string) => void;
+  onDelete: (id: string) => void;
+  selectedCategoryId: string;
+  slug: string;
+};
+
+const MenuCategoriesList = ({
+  categories,
+  onSelect,
+  onDelete,
+  selectedCategoryId,
+  slug,
+}: Props) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleAddCategory = async () => {
+    const name = inputRef.current?.value;
+
+    if (!name || name.trim().length < 3) {
+      return toast.error("O nome da tabela deve ter pelo menos 3 caracteres.");
+    }
+
+    try {
+      const result = await createCategory({
+        name,
+        slug,
+      });
+
+      if (result.success) {
+        toast.success("Tabela criada com sucesso!");
+        if (inputRef.current) inputRef.current.value = ""; // Limpa o campo
+      } else {
+        toast.error(result.error || "Erro ao criar categoria.");
+      }
+    } catch (error) {
+      toast.error("Erro crítico de conexão.");
+      console.error("Erro ao criar categoria:", error);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    try {
+      const result = await deleteCategory(id, slug);
+
+      if (result.success) {
+        toast.success("Tabela excluída com sucesso!");
+        onDelete(id);
+      } else {
+        toast.error(result.error || "Erro ao excluir categoria.");
+      }
+    } catch (error) {
+      toast.error("Erro crítico de conexão.");
+      console.error("Erro ao excluir categoria:", error);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
@@ -22,12 +95,33 @@ const MenuCategoriesList = () => {
           </CardDescription>
         </div>
         <div>
-          <Badge variant="outline">5</Badge>
+          <Badge variant="outline" className="border-primary/20 bg-primary/10">
+            {categories.length}
+          </Badge>
         </div>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-4 items-center justify-center">
-        <MenuTableCard />
+        <div className="flex flex-wrap gap-4 items-center justify-center">
+          {categories.map((cat) => (
+            <MenuTableCard
+              key={cat.id}
+              table={cat}
+              onSelect={onSelect}
+              onDelete={handleDeleteCategory}
+              selectedCategoryId={selectedCategoryId}
+            />
+          ))}
+        </div>
       </CardContent>
+      <CardFooter className="flex-col md:flex-row gap-2 border-t pt-6">
+        <Input ref={inputRef} placeholder="Ex: Pizzas, Bebidas, Promoções..." />
+        <div className="w-full ">
+          <Button onClick={handleAddCategory} className="w-full">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Nova Tabela
+          </Button>
+        </div>
+      </CardFooter>
     </Card>
   );
 };

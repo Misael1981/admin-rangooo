@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,13 +10,53 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronRight, Edit, Grid, MoreVertical, Trash2 } from "lucide-react";
 
-const MenuTableCard = () => {
+type CategorySummary = {
+  id: string;
+  name: string;
+  productsCount: number;
+};
+
+type Props = {
+  table: CategorySummary;
+  onSelect: (id: string) => void;
+  onDelete: (id: string) => void;
+  selectedCategoryId: string;
+};
+
+const MenuTableCard = ({
+  table,
+  onSelect,
+  onDelete,
+  selectedCategoryId,
+}: Props) => {
+  const isSelected = table.id === selectedCategoryId;
   return (
-    <div className="border flex-1 border-primary/20 bg-primary/10 max-w-60 flex items-center justify-between p-2">
-      <Grid size={16} />
-      <p className="text-primary font-medium">Tabela 1</p>
-      <div className="flex items-center gap-2  transition-opacity group-hover:opacity-100">
-        <ChevronRight size={16} />
+    <div
+      onClick={() => onSelect(table.id)}
+      className={`group relative cursor-pointer border h-24 flex-1 rounded-md min-w-60 max-w-72 gap-2 flex items-center justify-between p-2  transition-all
+    ${
+      isSelected
+        ? " border-primary/20 bg-primary/10"
+        : "border-gray-300 hover:bg-gray-50"
+    }
+  `}
+    >
+      <div
+        className={`flex h-8 w-8 items-center justify-center rounded-full ${isSelected ? "bg-primary text-white" : "bg-gray-100 text-primary"}`}
+      >
+        <Grid size={16} />
+      </div>
+      <div className="text-center">
+        <p className="font-medium ">{table.name}</p>
+        <p className="text-xs text-gray-500">
+          {table.productsCount} produto(s)
+        </p>
+      </div>
+      <div className="flex items-center gap-2 md:opacity-0 transition-opacity group-hover:opacity-100">
+        <ChevronRight
+          size={16}
+          className={`${isSelected ? "text-primary" : "text-gray-400"}`}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -27,7 +69,13 @@ const MenuTableCard = () => {
               Renomear
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem
+              className="text-red-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(table.id);
+              }}
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Excluir
             </DropdownMenuItem>

@@ -42,7 +42,7 @@ export default async function CardapioPage({
     <div className="space-y-6 px-8 pb-8">
       <HeaderCardapio />
 
-      <ManageMenu menuData={menuData} />
+      <ManageMenu menuData={menuData} slug={slug} />
     </div>
   );
 }
