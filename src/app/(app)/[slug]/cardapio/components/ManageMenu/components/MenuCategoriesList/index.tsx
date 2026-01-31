@@ -26,9 +26,7 @@ const MenuCategoriesList = () => {
         </div>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-4 items-center justify-center">
-        <div className="p-4">
-          <MenuTableCard />
-        </div>
+        <MenuTableCard />
       </CardContent>
     </Card>
   );

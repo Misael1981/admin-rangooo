@@ -10,8 +10,8 @@ import { ChevronRight, Edit, Grid, MoreVertical, Trash2 } from "lucide-react";
 
 const MenuTableCard = () => {
   return (
-    <div className="border border-primary/20 bg-primary/10 w-56 flex items-center justify-between p-4">
-      <Grid size={24} />
+    <div className="border flex-1 border-primary/20 bg-primary/10 max-w-60 flex items-center justify-between p-2">
+      <Grid size={16} />
       <p className="text-primary font-medium">Tabela 1</p>
       <div className="flex items-center gap-2  transition-opacity group-hover:opacity-100">
         <ChevronRight size={16} />

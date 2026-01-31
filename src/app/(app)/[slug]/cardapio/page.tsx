@@ -1,6 +1,7 @@
 import { getRestaurantMenuBySlug } from "@/data/get-restaurant-menu";
 import HeaderCardapio from "./components/HearderCardapio";
 import ManageMenu from "./components/ManageMenu";
+import { MenuCategoryDTO } from "@/dtos/menu.dto";
 
 export default async function CardapioPage({
   params,
@@ -15,23 +16,33 @@ export default async function CardapioPage({
     return <div>O cardápio ainda está sendo montado ou não existe.</div>;
   }
 
-  // Aqui você faz a serialização uma única vez se necessário
-  const menuData = categories.map((cat) => ({
-    ...cat,
-    products: cat.products.map((p) => ({ ...p, price: Number(p.price) })),
+  const menuData: MenuCategoryDTO[] = categories.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    displayOrder: cat.displayOrder,
+    productsCount: cat._count.products,
+
+    products: cat.products.map((p) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      price: Number(p.price),
+      imageUrl: p.imageUrl,
+      ingredients: p.ingredients,
+    })),
+
     additionalIngredients: cat.additionalIngredients.map((i) => ({
-      ...i,
+      id: i.id,
+      name: i.name,
       price: Number(i.price),
     })),
   }));
-
-  console.log("menuData:", menuData);
 
   return (
     <div className="space-y-6 px-8 pb-8">
       <HeaderCardapio />
 
-      <ManageMenu />
+      <ManageMenu menuData={menuData} />
     </div>
   );
 }
