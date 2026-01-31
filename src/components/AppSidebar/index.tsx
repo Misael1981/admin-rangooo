@@ -53,7 +53,7 @@ export function AppSidebar() {
     },
     {
       title: "Gerenciar Cardápio",
-      url: `/${slug}/products`,
+      url: `/${slug}/cardapio`,
       icon: ShoppingBasket,
     },
     {
