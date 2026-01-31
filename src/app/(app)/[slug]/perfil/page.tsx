@@ -5,6 +5,7 @@ import HeaderPerfil from "./components/HeaderPerfil";
 import EstablishmentContacts from "./components/EstablishmentContacts";
 import SocialMediaEstablishment from "./components/SocialMediaEstablishment";
 import EstablishmentAddress from "./components/EstablishmentAddress";
+import GalleryWithDescriptionEstablishment from "./components/GalleryWithDescriptionEstablishment";
 
 export default async function PerfilPage({
   params,
@@ -78,6 +79,13 @@ export default async function PerfilPage({
           zipCode: restaurant.zipCode ?? "",
           country: "Brasil",
         }}
+      />
+
+      <GalleryWithDescriptionEstablishment
+        description={restaurant.description || ""}
+        avatarImageUrl={restaurant.avatarImageUrl || ""}
+        coverImageUrl={restaurant.coverImageUrl || ""}
+        restaurantId={restaurant.id}
       />
     </div>
   );
