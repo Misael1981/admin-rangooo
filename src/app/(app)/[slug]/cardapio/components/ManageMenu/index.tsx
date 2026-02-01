@@ -4,6 +4,8 @@ import { useReducer } from "react";
 import { menuReducer } from "../../reducers/menuReducer";
 import MenuCategoriesList from "./components/MenuCategoriesList";
 import { MenuCategoryDTO } from "@/dtos/menu.dto";
+import SelectedTableName from "./components/SelectedTableName";
+import AdditionalProductsCard from "./components/AdditionalProductsCard";
 
 const ManageMenu = ({
   menuData,
@@ -35,8 +37,23 @@ const ManageMenu = ({
     productsCount: cat.products?.length ?? 0,
   }));
 
+  const additionalProductsCategory = menuData.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    additionalProducts:
+      cat.additionalIngredients?.map((ing) => ({
+        ...ing,
+        price: Number(ing.price),
+      })) || [],
+  }));
+
+  const selectedCategory =
+    additionalProductsCategory.find(
+      (cat) => cat.id === state.selectedCategoryId,
+    ) ?? null;
+
   return (
-    <div>
+    <div className="space-y-6">
       <MenuCategoriesList
         categories={categoriesSummary}
         onSelect={handleSelectCategory}
@@ -44,6 +61,13 @@ const ManageMenu = ({
         selectedCategoryId={state.selectedCategoryId ?? ""}
         slug={slug}
       />
+
+      <SelectedTableName
+        selectedCategoryId={state.selectedCategoryId ?? ""}
+        categories={categoriesSummary}
+      />
+
+      <AdditionalProductsCard selectedCategory={selectedCategory} slug={slug} />
     </div>
   );
 };
