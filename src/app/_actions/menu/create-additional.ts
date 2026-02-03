@@ -25,8 +25,7 @@ export async function createAdditional({
       },
     });
 
-    revalidatePath(`/admin/${slug}/cardapio`);
-    revalidatePath(`/${slug}`);
+    revalidatePath(`/${slug}/cardapio`);
 
     return { success: true };
   } catch (error) {
@@ -52,9 +51,7 @@ export async function updateAdditional({
       data: { name, price },
     });
 
-    // Limpa o cache para o usuário ver o preço/nome novo
-    revalidatePath(`/admin/${slug}/cardapio`);
-    revalidatePath(`/${slug}`);
+    revalidatePath(`/${slug}/cardapio`);
 
     return { success: true };
   } catch (error) {
