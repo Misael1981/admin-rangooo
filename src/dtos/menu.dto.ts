@@ -7,7 +7,7 @@ export interface MenuCategoryDTO {
   additionalIngredients: AdditionalIngredientDTO[];
 }
 
-interface MenuProductDTO {
+export interface MenuProductDTO {
   id: string;
   name: string;
   description: string | null;
@@ -20,4 +20,26 @@ export interface AdditionalIngredientDTO {
   id: string;
   name: string;
   price: number;
+}
+
+export interface MenuCategoryWithProductsDTO {
+  id: string;
+  name: string;
+  products: {
+    id: string;
+    name: string;
+    price: number;
+    description: string | null;
+    imageUrl: string | null;
+    ingredients: string[];
+  }[];
+}
+
+export interface MenuProductWithCategoryDTO {
+  id: string;
+  name: string;
+  price: number;
+  description: string | null;
+  imageUrl: string | null;
+  ingredients: string[];
 }

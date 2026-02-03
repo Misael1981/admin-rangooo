@@ -5,12 +5,12 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import ImageUpload from "../ImageUpload";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { uploadToCloudinary } from "@/app/_actions/upload-cloudinary";
 import { toast } from "sonner";
 import { updateGalleryDescription } from "@/app/_actions/update-gallery-description";
+import ImageUpload from "@/components/ImageUpload";
 
 type GalleryWithDescriptionValue = z.infer<typeof galleryWithDescriptionSchema>;
 

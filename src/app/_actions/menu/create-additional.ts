@@ -69,8 +69,7 @@ export async function deleteAdditional(id: string, slug: string) {
       where: { id },
     });
 
-    revalidatePath(`/admin/${slug}/cardapio`);
-    revalidatePath(`/${slug}`);
+    revalidatePath(`/${slug}/cardapio`);
 
     return { success: true };
   } catch (error) {

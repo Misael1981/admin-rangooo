@@ -8,7 +8,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useHasMounted } from "@/hooks/use-has-mounted";
 import { ChevronRight, Edit, Grid, MoreVertical, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type CategorySummary = {
   id: string;
@@ -30,6 +32,14 @@ const MenuTableCard = ({
   selectedCategoryId,
 }: Props) => {
   const isSelected = table.id === selectedCategoryId;
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
   return (
     <div
       onClick={() => onSelect(table.id)}

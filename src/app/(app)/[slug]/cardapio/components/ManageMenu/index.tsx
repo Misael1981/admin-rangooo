@@ -6,6 +6,7 @@ import MenuCategoriesList from "./components/MenuCategoriesList";
 import { MenuCategoryDTO } from "@/dtos/menu.dto";
 import SelectedTableName from "./components/SelectedTableName";
 import AdditionalProductsCard from "./components/AdditionalProductsCard";
+import ProductsListSession from "./components/ProductsListSession";
 
 const ManageMenu = ({
   menuData,
@@ -52,6 +53,19 @@ const ManageMenu = ({
       (cat) => cat.id === state.selectedCategoryId,
     ) ?? null;
 
+  const productsCategory = menuData.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    products:
+      cat.products?.map((prod) => ({
+        ...prod,
+        price: Number(prod.price),
+      })) || [],
+  }));
+
+  const selectedProductsCategory =
+    productsCategory.find((cat) => cat.id === state.selectedCategoryId) ?? null;
+
   return (
     <div className="space-y-6">
       <MenuCategoriesList
@@ -68,6 +82,11 @@ const ManageMenu = ({
       />
 
       <AdditionalProductsCard selectedCategory={selectedCategory} slug={slug} />
+
+      <ProductsListSession
+        selectedProductsCategory={selectedProductsCategory}
+        slug={slug}
+      />
     </div>
   );
 };
