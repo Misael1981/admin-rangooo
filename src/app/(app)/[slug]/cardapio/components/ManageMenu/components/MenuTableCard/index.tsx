@@ -1,5 +1,6 @@
 "use client";
 
+import AlertDialogDelete from "@/components/AlertDialogDelete";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronRight, Edit, Grid, MoreVertical, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 type CategorySummary = {
   id: string;
@@ -29,6 +31,8 @@ const MenuTableCard = ({
   onDelete,
   selectedCategoryId,
 }: Props) => {
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
   const isSelected = table.id === selectedCategoryId;
 
   return (
@@ -72,10 +76,7 @@ const MenuTableCard = ({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-red-600"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(table.id);
-              }}
+              onClick={() => setOpenDeleteDialog(true)}
             >
               <Trash2 className="mr-2 h-4 w-4" />
               Excluir
@@ -83,6 +84,13 @@ const MenuTableCard = ({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <AlertDialogDelete
+        isOpen={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+        title={`${table.name}`}
+        onDelete={() => onDelete(table.id)}
+      />
     </div>
   );
 };
