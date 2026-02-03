@@ -34,6 +34,10 @@ export default withAuth(
       }
     }
 
+    if (token?.role === "RESTAURANT_OWNER" && !token.slug) {
+      return NextResponse.redirect(new URL("/sem-acesso", req.url));
+    }
+
     // 4. FALLBACK: Se cair aqui, manda pro login
     return NextResponse.next();
   },
