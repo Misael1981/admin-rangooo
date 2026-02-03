@@ -2,6 +2,7 @@ import { getRestaurantMenuBySlug } from "@/data/get-restaurant-menu";
 import HeaderCardapio from "./components/HearderCardapio";
 import ManageMenu from "./components/ManageMenu";
 import { MenuCategoryDTO } from "@/dtos/menu.dto";
+import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 
 export default async function CardapioPage({
   params,
@@ -40,6 +41,8 @@ export default async function CardapioPage({
 
   return (
     <div className="space-y-6 px-8 pb-8">
+      {/* Breadcrumb */}
+      <BreadcrumbComponent currentPage="Cardápio" slug={slug} />
       <HeaderCardapio />
 
       <ManageMenu menuData={menuData} slug={slug} />

@@ -10,6 +10,7 @@ import { ConsumptionMethod, PaymentMethod } from "@prisma/client";
 import FilterConsumptionMethods from "./components/FilterConsumptionMethods";
 import CardOrder from "./components/CardOrder";
 import { Prisma } from "@prisma/client";
+import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 
 type OrderAddress = {
   street: string;
@@ -90,6 +91,8 @@ export default async function OrdersPage({
 
   return (
     <div className="space-y-6 px-8 pb-8">
+      {/* Breadcrumb */}
+      <BreadcrumbComponent currentPage="Pedidos" slug={slug} />
       <HeaderOrdersPage totalOrders={orders.length} />
 
       <ConsumptionAndPaymentMethodsForm

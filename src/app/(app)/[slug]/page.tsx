@@ -7,6 +7,7 @@ import StatusOpenSwitch from "@/components/StatusOpenSwitch";
 import CardForHeader from "./components/CardForHeader";
 import DailySalesSummary from "./components/DailySalesSummary";
 import { endOfDay, startOfDay } from "date-fns";
+import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 interface RestaurantPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -54,11 +55,9 @@ export default async function Establishment({ params }: RestaurantPageProps) {
   return (
     <div className="px-8 space-y-8 pb-8">
       {/* Header */}
+      <BreadcrumbComponent currentPage="" slug={slug} />
       <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <CardForHeader
-          restaurantName={restaurant.name}
-          userName={session.user.name}
-        />
+        <CardForHeader userName={session.user.name} />
 
         <div className="flex items-start md:items-center justify-center">
           <StatusOpenSwitch

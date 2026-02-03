@@ -2,12 +2,13 @@
 
 import {
   Calendar,
+  ClipboardList,
   Home,
   Inbox,
-  Printer,
   Search,
   Settings,
   ShoppingBasket,
+  Store,
   Users,
   Warehouse,
 } from "lucide-react";
@@ -44,12 +45,12 @@ export function AppSidebar() {
     {
       title: "Gerenciar Pedidos",
       url: `/${slug}/pedidos`,
-      icon: Inbox,
+      icon: ClipboardList,
     },
     {
       title: "Perfil do Estabelecimento",
       url: `/${slug}/perfil`,
-      icon: Warehouse,
+      icon: Store,
     },
     {
       title: "Gerenciar Cardápio",
@@ -60,11 +61,6 @@ export function AppSidebar() {
       title: "Gerenciar Usuários",
       url: `/${slug}/users`,
       icon: Users,
-    },
-    {
-      title: "Status de Impressão",
-      url: `/${slug}/printing-status`,
-      icon: Printer,
     },
   ];
 

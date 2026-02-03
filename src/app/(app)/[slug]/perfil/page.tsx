@@ -6,6 +6,7 @@ import EstablishmentContacts from "./components/EstablishmentContacts";
 import SocialMediaEstablishment from "./components/SocialMediaEstablishment";
 import EstablishmentAddress from "./components/EstablishmentAddress";
 import GalleryWithDescriptionEstablishment from "./components/GalleryWithDescriptionEstablishment";
+import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 
 export default async function PerfilPage({
   params,
@@ -47,6 +48,11 @@ export default async function PerfilPage({
 
   return (
     <div className="space-y-6 px-8 pb-8">
+      {/* Breadcrumb */}
+      <BreadcrumbComponent
+        currentPage="Perfil do Estabelecimento"
+        slug={slug}
+      />
       <HeaderPerfil />
 
       <GeneralInformation

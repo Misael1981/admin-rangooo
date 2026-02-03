@@ -1,19 +1,12 @@
 import { UserCircle } from "lucide-react";
 
 interface CardForHeaderProps {
-  restaurantName: string;
   userName: string | null | undefined;
 }
 
-const CardForHeader = ({ restaurantName, userName }: CardForHeaderProps) => {
+const CardForHeader = ({ userName }: CardForHeaderProps) => {
   return (
     <div>
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-        <span className="font-medium text-red-500">Dashboard</span>
-        <span>/</span>
-        <span className="capitalize">{restaurantName.toLowerCase()}</span>
-      </div>
-
       <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 md:text-3xl">
         Painel Administrativo
       </h1>
