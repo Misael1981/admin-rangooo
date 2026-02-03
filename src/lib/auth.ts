@@ -52,7 +52,7 @@ export const authOptions: NextAuthOptions = {
           where: { ownerId: user.id },
           select: { slug: true },
         });
-        console.log("Busca de Restaurante no Login:", restaurant); // Adicione esse log
+        console.log("Busca de Restaurante no Login:", restaurant);
         token.slug = restaurant?.slug;
       }
       return token;

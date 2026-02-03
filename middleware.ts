@@ -17,7 +17,8 @@ export default withAuth(
     // 2. BLOQUEIO DE ROTA ADMIN PARA NÃO-ADMINS
     // Impede que um dono de restaurante acesse /rangooo
     if (urlPath.startsWith("/rangooo") && token?.role !== "ADMIN") {
-      return NextResponse.redirect(new URL(`/${token?.slug || ""}`, req.url));
+      const redirectUrl = token?.slug ? `/${token.slug}` : "/";
+      return NextResponse.redirect(new URL(redirectUrl, req.url));
     }
 
     // 3. REGRA DO RESTAURANT_OWNER (Multi-tenant)

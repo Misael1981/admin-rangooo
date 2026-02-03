@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Calendar,
   ClipboardList,
   Home,
   Inbox,
@@ -79,10 +78,6 @@ export function AppSidebar() {
       title: "Perfil do Estabelecimento",
       url: `/${slug}/perfil`,
       icon: Warehouse,
-    },
-    {
-      url: "#",
-      icon: Calendar,
     },
     {
       title: "Search",
