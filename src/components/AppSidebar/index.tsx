@@ -59,7 +59,7 @@ export function AppSidebar() {
     },
     {
       title: "Gerenciar Usuários",
-      url: `/${slug}/users`,
+      url: `/${slug}/usuarios`,
       icon: Users,
     },
   ];
