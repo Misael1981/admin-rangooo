@@ -7,35 +7,52 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ===============================================
-// Usuários (Clientes e Entregadores)
-// ===============================================
-
 model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String    @unique
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  phone         String?
-  password      String?   @map("hashed_password")
-  address       Json?     
-  role          Role      @default(CLIENT) // CLIENTE, RESTAURANT_OWNER, DELIVERY_PERSON, ADMIN
+  id                 String    @id @default(uuid())
+  name               String
+  email              String    @unique
+  emailVerified      DateTime? @map("email_verified")
+  image              String?
+  phone              String?
+  addresses          Address[]
+  isProfileCompleted Boolean   @default(false)
+
+  role Role @default(CLIENT)
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  password        String?          @map("hashed_password")
+  orders          Order[]
+  restaurants     Restaurant[]
+  restaurantRoles RestaurantUser[]
+  accounts        Account[]
+  sessions        Session[]
+
+  @@map("users")
+}
+
+model Address {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name         String? // Ex: "Casa", "Trabalho"
+  cep          String?
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  reference    String?
+  areaType     AreaType @default(URBAN)
+  city         String
+  state        String   @db.Char(2)
+  isDefault    Boolean  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relação com Pedidos
-  orders Order[]
-
-  // Relação com Restaurante (para donos de restaurante)
-  restaurants Restaurant[]
-  restaurantRoles RestaurantUser[]
-
-  accounts Account[]
-  sessions Session[]
-
-  @@map("users")
+  @@index([city])
+  @@map("addresses")
 }
 
 model Account {
@@ -44,15 +61,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -77,28 +93,231 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-// ===============================================
-// Lead Application (Aplicação de Lead)
-// ===============================================
-
 model LeadApplication {
-  id             String     @id @default(cuid())
+  id             String             @id @default(cuid())
   name           String
   email          String
   phone          String
   restaurantName String
+  notes          String?
+  status         LeadStatus         @default(PENDING)
+  approvedAt     DateTime?
+  approvedBy     String?
+  createdAt      DateTime           @default(now())
   city           String
   state          String
-  notes          String?
-  status         LeadStatus @default(PENDING)
-  approvedAt     DateTime?
-  approvedBy     String?    // admin user id
-
   invites        EnrollmentInvite[]
 
-  createdAt      DateTime   @default(now())
+  @@unique([email, status])
   @@index([status, createdAt])
-  @@unique([email, status]) // evita múltiplos PENDING por email
+}
+
+model EnrollmentInvite {
+  id        String          @id @default(cuid())
+  leadId    String
+  email     String
+  token     String          @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  status    InviteStatus    @default(PENDING)
+  createdAt DateTime        @default(now())
+  lead      LeadApplication @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([status, expiresAt])
+}
+
+model Restaurant {
+  id                 String                        @id @default(uuid())
+  ownerId            String
+  name               String
+  slug               String                        @unique
+  description        String?
+  avatarImageUrl     String?
+  coverImageUrl      String?
+  latitude           Decimal
+  longitude          Decimal
+  isOpen             Boolean                       @default(true)
+  createdAt          DateTime                      @default(now())
+  updatedAt          DateTime                      @updatedAt
+  brandColors        Json?
+  socialMedia        Json?
+  city               String?
+  complement         String?
+  neighborhood       String?
+  number             String?
+  state              String?                       @db.VarChar(2)
+  street             String?
+  zipCode            String?
+  email              String?
+  agentVersion       String?
+  lastPrintedAt      DateTime?
+  printerConfig      Json?
+  printerStatus      String?                       @default("disconnected")
+  printerType        String?
+  printingToken      String?                       @unique
+  deliveryFee        Decimal?                      @db.Decimal(6, 2)
+  category           RestaurantCategory            @default(RESTAURANT)
+  businessHours      BusinessHours[]
+  contacts           ContactNumber[]
+  menuCategories     MenuCategory[]
+  orders             Order[]
+  products           Product[]
+  owner              User                          @relation(fields: [ownerId], references: [id])
+  consumptionMethods RestaurantConsumptionMethod[]
+  paymentMethods     RestaurantPaymentMethod[]
+  users              RestaurantUser[]
+
+  @@index([ownerId])
+}
+
+model RestaurantUser {
+  id           String         @id @default(uuid())
+  userId       String
+  restaurantId String
+  role         RestaurantRole @default(MANAGER)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  restaurant   Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, restaurantId])
+  @@index([restaurantId])
+}
+
+model RestaurantConsumptionMethod {
+  id           String            @id @default(cuid())
+  restaurantId String
+  method       ConsumptionMethod
+  isActive     Boolean           @default(true)
+  displayOrder Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  restaurant   Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, method])
+  @@index([restaurantId, isActive])
+}
+
+model ContactNumber {
+  id           String      @id @default(cuid())
+  restaurantId String
+  type         ContactType
+  number       String
+  label        String?
+  isPrimary    Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId, type])
+}
+
+model BusinessHours {
+  id           String     @id @default(cuid())
+  restaurantId String
+  dayOfWeek    Int
+  timeSlots    Json
+  isClosed     Boolean    @default(false)
+  displayOrder Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, dayOfWeek])
+  @@index([restaurantId, dayOfWeek])
+}
+
+model RestaurantPaymentMethod {
+  id           String        @id @default(cuid())
+  restaurantId String
+  method       PaymentMethod
+  cardBrands   CardBrand[]
+  isActive     Boolean       @default(true)
+  description  String?
+  displayOrder Int           @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  restaurant   Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, method])
+  @@index([restaurantId, isActive])
+}
+
+model MenuCategory {
+  id                    String                 @id @default(uuid())
+  name                  String
+  restaurantId          String
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  displayOrder          Int                    @default(0)
+  additionalIngredients AdditionalIngredient[]
+  restaurant            Restaurant             @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  products              Product[]
+}
+
+model Product {
+  id             String       @id @default(uuid())
+  restaurantId   String
+  name           String
+  description    String?
+  price          Decimal      @db.Decimal(6, 2)
+  imageUrl       String?
+  ingredients    String[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  menuCategoryId String
+  orderItems     OrderItem[]
+  menuCategory   MenuCategory @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
+  restaurant     Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+}
+
+model AdditionalIngredient {
+  id             String       @id @default(cuid())
+  name           String
+  price          Decimal      @db.Decimal(6, 2)
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  menuCategoryId String       @map("menu_category_id")
+  menuCategory   MenuCategory @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
+
+  @@unique([menuCategoryId, name])
+  @@index([menuCategoryId])
+}
+
+model Order {
+  id                String            @id @default(uuid())
+  userId            String
+  restaurantId      String
+  totalAmount       Decimal           @db.Decimal(10, 2)
+  deliveryFee       Decimal           @default(0) @db.Decimal(6, 2)
+  status            OrderStatus       @default(PENDING)
+  consumptionMethod ConsumptionMethod @default(DELIVERY)
+  deliveryAddress   Json?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  customName        String?
+  extras            String?
+  orderNumber       Int?
+  printId           String?
+  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items             OrderItem[]
+}
+
+model OrderItem {
+  id                    String   @id @default(uuid())
+  orderId               String
+  productId             String
+  quantity              Int
+  priceAtOrder          Decimal  @db.Decimal(6, 2)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  additionalIngredients Json?
+  customName            String?
+  extras                String?
+  order                 Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product               Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 enum InviteStatus {
@@ -107,313 +326,10 @@ enum InviteStatus {
   EXPIRED
 }
 
-model EnrollmentInvite {
-  id         String       @id @default(cuid())
-  leadId     String
-  email      String
-  token      String       @unique
-  expiresAt  DateTime
-  usedAt     DateTime?
-  status     InviteStatus @default(PENDING)
-
-  lead       LeadApplication @relation(fields: [leadId], references: [id], onDelete: Cascade)
-
-  createdAt  DateTime     @default(now())
-
-  @@index([status, expiresAt])
-}
-
-
-
-// ===============================================
-// Restaurantes (Parceiro)
-// ===============================================
-
-model Restaurant {
-  id             String  @id @default(uuid())
-  ownerId        String 
-  name           String
-  slug           String  @unique 
-  description    String?
-  avatarImageUrl String? 
-  coverImageUrl  String? 
-
-  category RestaurantCategory @default(RESTAURANT)
-
-  latitude  Decimal
-  longitude Decimal
-  address   String // Lembrar de tirar esse campo quando eu apagar o seed
-
-  street         String?
-  number         String?
-  complement     String?
-  neighborhood   String?
-  city           String?
-  state          String?            @db.VarChar(2)
-  zipCode        String?
-  deliveryFee    Decimal?            @db.Decimal(6, 2) 
-
-  contacts    ContactNumber[]
-  socialMedia Json? 
-  email       String?
-
-  brandColors Json?
-  isOpen Boolean @default(true) 
-
-  // Configuração de impressão
-  printingToken String?  @unique  
-  printerStatus String?  @default("disconnected")
-  lastPrintedAt DateTime?
-  agentVersion  String?
-  printerType   String?  
-  printerConfig Json?    
-
-  // Relações
-  owner                 User                   @relation(fields: [ownerId], references: [id], onDelete: Restrict)
-  products              Product[]
-  menuCategories        MenuCategory[]
-  orders                Order[]
-  businessHours         BusinessHours[]
-  paymentMethods        RestaurantPaymentMethod[]
-  consumptionMethods    RestaurantConsumptionMethod[]
-  users                 RestaurantUser[]
-
-  createdAt             DateTime                @default(now())
-  updatedAt             DateTime                @updatedAt
-
-  @@index([ownerId])
-}
-
-// ===============================================
-// Tabela para vincular usuários a restaurantes com permissões específicas
-// ===============================================
-
-model RestaurantUser {
-  id           String   @id @default(uuid())
-  userId       String
-  restaurantId String
-  role         RestaurantRole @default(MANAGER) // OWNER, MANAGER, EMPLOYEE, VIEWER
-  
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade) 
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@unique([userId, restaurantId])
-  @@index([restaurantId])
-}
-
-// ===============================================
-// Métodos de Consumo
-// ===============================================
-
-model RestaurantConsumptionMethod {
-  id           String            @id @default(cuid())
-  restaurantId String
-  restaurant   Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-
-  method       ConsumptionMethod
-  isActive     Boolean           @default(true)
-  displayOrder Int               @default(0)
-
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-
-  @@unique([restaurantId, method])
-  @@index([restaurantId, isActive])
-}
-
-// ===============================================
-// Contatos do Restaurante
-// ===============================================
-model ContactNumber {
-  id           String     @id @default(cuid())
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  restaurantId String
-
-  type      ContactType
-  number    String
-  label     String?
-  isPrimary Boolean     @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([restaurantId, type])
-}
-
-// ===============================================
-// Horários de Funcionamento
-// ===============================================
-
-model BusinessHours {
-  id           String   @id @default(cuid())
-  restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  
-  // Dia da semana (0 = Domingo, 1 = Segunda, ..., 6 = Sábado)
-  dayOfWeek    Int     // 0-6 (Domingo-Sábado)
-  
-  // Horários de abertura/fechamento (pode ter múltiplos períodos por dia)
-  timeSlots    Json     // Array de { open: "HH:MM", close: "HH:MM", type: "LUNCH" | "DINNER" | "BREAKFAST" }
-  
-  // Se o estabelecimento está fechado neste dia
-  isClosed     Boolean  @default(false)
-  
-  // Ordem para exibição (opcional)
-  displayOrder Int      @default(0)
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@unique([restaurantId, dayOfWeek])
-  @@index([restaurantId, dayOfWeek])
-}
-
-// ===============================================
-// Métodos de Pagamento do Estabelecimento
-// ===============================================
-
-model RestaurantPaymentMethod {
-  id           String  @id @default(cuid())
-  restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  
-  // Método principal (Dinheiro, PIX, Cartão)
-  method       PaymentMethod
-  
-  // Para cartões: quais bandeiras são aceitas
-  cardBrands   CardBrand[] // Array de bandeiras aceitas
-  
-  // Configurações específicas
-  isActive     Boolean @default(true)
-  description  String? // Ex: "PIX - Chave: 11999999999"
-  
-  // Ordem de exibição
-  displayOrder Int     @default(0)
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@unique([restaurantId, method])
-  @@index([restaurantId, isActive])
-}
-
-// ===============================================
-// Categorias de Cardápio
-// ===============================================
-model MenuCategory {
-  id                     String                  @id @default(uuid())
-  name                   String
-  displayOrder           Int                     @default(0)
-  restaurant             Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  restaurantId           String
-  products               Product[]
-  additionalIngredients  AdditionalIngredient[]
-  createdAt              DateTime                @default(now())
-  updatedAt              DateTime                @updatedAt
-}
-
-// ===============================================
-// Produtos (Itens do Cardápio)
-// ===============================================
-model Product {
-  id           String   @id @default(uuid())
-  restaurantId String
-  name         String
-  description  String?
-  price        Decimal  @db.Decimal(6, 2) 
-  imageUrl     String? 
-  ingredients  String[] 
-
-  menuCategoryId String
-  menuCategory   MenuCategory @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
-
-  // Relações
-  restaurant          Restaurant              @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  orderItems          OrderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// ===============================================
-// Ingredientes Adicionais (Extras)
-// ===============================================
-model AdditionalIngredient {
-  id             String      @id @default(cuid())
-  menuCategoryId String      @map("menu_category_id")
-  name           String
-  price          Decimal     @db.Decimal(6, 2)
-  isActive       Boolean     @default(true)
-
-  menuCategory   MenuCategory @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
-
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-
-  @@unique([menuCategoryId, name])
-  @@index([menuCategoryId])
-}
-
-
-// ===============================================
-// 4. Pedidos (Transação Principal)
-// ===============================================
-
-model Order {
-  id                String            @id @default(uuid())
-  userId            String 
-  restaurantId      String
-  printId           String?           // Para o controle do WebSocket
-  orderNumber       Int?
-  totalAmount       Decimal           @db.Decimal(10, 2) 
-  deliveryFee       Decimal           @db.Decimal(6,2) @default(0)
-  status            OrderStatus       @default(PENDING) 
-  consumptionMethod ConsumptionMethod @default(DELIVERY) 
-  customName        String?
-  extras            String?
-  deliveryAddress   Json? 
-
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  restaurant Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  items      OrderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// ===============================================
-// 5. Itens do Pedido (Detalhes)
-// ===============================================
-
-model OrderItem {
-  id        String @id @default(uuid())
-  orderId   String
-  productId String
-  quantity  Int
-  customName   String?
-  extras       String?
-  priceAtOrder Decimal @db.Decimal(6, 2)
-  
-  // Relações
-  additionalIngredients Json?
-  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// ===============================================
-// ENUMS DE APOIO
-// ===============================================
-
 enum LeadStatus {
-  PENDING 
-  APPROVED 
-  REJECTED 
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum RestaurantCategory {
@@ -426,7 +342,6 @@ enum RestaurantCategory {
   DOCES
 }
 
-// Enum para Nível de Usuário
 enum Role {
   CLIENT
   RESTAURANT_OWNER
@@ -435,19 +350,17 @@ enum Role {
 }
 
 enum OrderStatus {
-  PENDING 
-  CONFIRMED 
-  PREPARING 
-  READY_FOR_PICKUP 
-  OUT_FOR_DELIVERY 
-  DELIVERED 
-  CANCELED 
+  PENDING
+  CONFIRMED
+  PREPARING
+  DELIVERED
+  CANCELED
 }
 
 enum ConsumptionMethod {
-  DELIVERY 
-  PICKUP 
-  DINE_IN // Consumo no local dine-in
+  DELIVERY
+  PICKUP
+  DINE_IN
 }
 
 enum ContactType {
@@ -456,13 +369,13 @@ enum ContactType {
 }
 
 enum PaymentMethod {
-  CASH       
-  PIX       
-  CREDIT_CARD 
-  DEBIT_CARD  
-  MEAL_VOUCHER 
-  FOOD_VOUCHER 
-  ONLINE      
+  CASH
+  PIX
+  CREDIT_CARD
+  DEBIT_CARD
+  MEAL_VOUCHER
+  FOOD_VOUCHER
+  ONLINE
 }
 
 enum CardBrand {
@@ -477,8 +390,14 @@ enum CardBrand {
 }
 
 enum RestaurantRole {
-  OWNER    
-  MANAGER  
-  EMPLOYEE  
-  VIEWER    
+  OWNER
+  MANAGER
+  EMPLOYEE
+  VIEWER
+}
+
+enum AreaType {
+  URBAN
+  RURAL
+  DISTRICT
 }

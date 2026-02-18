@@ -2,8 +2,8 @@
 
 import {
   ClipboardList,
+  ClipboardPenLine,
   Home,
-  Inbox,
   Search,
   Settings,
   ShoppingBasket,
@@ -66,18 +66,18 @@ export function AppSidebar() {
   const linksRangooo = [
     {
       title: "Home",
-      url: "/admin-rangooo",
+      url: "/rangooo",
       icon: Home,
     },
     {
-      title: "Gerenciar Pedidos",
-      url: `${slug}/pedidos}`,
-      icon: Inbox,
+      title: "Gerenciar Estabelecimentos",
+      url: "/rangooo/estabelecimentos",
+      icon: Warehouse,
     },
     {
-      title: "Perfil do Estabelecimento",
-      url: `/${slug}/perfil`,
-      icon: Warehouse,
+      title: "Pedidos de Cadastro",
+      url: `/rangooo/pedidos-cadastro`,
+      icon: ClipboardPenLine,
     },
     {
       title: "Search",
