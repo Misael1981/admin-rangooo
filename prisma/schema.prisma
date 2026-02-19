@@ -104,6 +104,8 @@ model LeadApplication {
   approvedAt     DateTime?
   approvedBy     String?
   createdAt      DateTime           @default(now())
+  rejectedAt     DateTime?          
+  rejectionReason String?
   city           String
   state          String
   invites        EnrollmentInvite[]

@@ -6,8 +6,6 @@ import LeadCard from "./components/LeadCard";
 export default async function PedidosCadastroPage() {
   const leads = await getLeads();
 
-  console.log(leads);
-
   return (
     <div className="px-4 lg:px-8 pb-8">
       <HeaderPages
