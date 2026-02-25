@@ -161,9 +161,9 @@ const ProductsListSession = ({
         dialogAddProductOpen={dialogAddProductOpen}
         setDialogAddProductOpen={setDialogAddProductOpen}
         product={selectedProduct}
-        slug={slug}
         selectedCategoryName={selectedProductsCategory.name}
         selectedCategoryId={selectedProductsCategory.id}
+        slug={slug}
       />
     </section>
   );

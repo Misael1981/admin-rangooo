@@ -24,9 +24,7 @@ const RestaurantCategory = [
   "PIZZARIA",
   "HAMBURGUERIA",
   "SORVETERIA",
-  "ACAI",
-  "SAUDAVEL",
-  "DOCES",
+  "ADEGA",
 ] as const;
 
 const CATEGORY_LABELS: Record<(typeof RestaurantCategory)[number], string> = {
@@ -34,9 +32,7 @@ const CATEGORY_LABELS: Record<(typeof RestaurantCategory)[number], string> = {
   PIZZARIA: "Pizzaria",
   HAMBURGUERIA: "Hamburgueria",
   SORVETERIA: "Sorveteria",
-  ACAI: "Açaí",
-  SAUDAVEL: "Saudável",
-  DOCES: "Doces",
+  ADEGA: "Adega",
 };
 
 const generalInfoSchema = z.object({
