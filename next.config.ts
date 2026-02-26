@@ -1,4 +1,12 @@
 import type { NextConfig } from "next";
+import withPWAInit from "next-pwa";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV === "development",
+});
 
 const nextConfig: NextConfig = {
   images: {
@@ -6,10 +14,13 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
-        pathname: "/**", // Permite todas as pastas do seu Cloudinary
+        pathname: "/**",
       },
     ],
   },
+  webpack: (config) => {
+    return config;
+  },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
