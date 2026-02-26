@@ -57,12 +57,12 @@ export default async function PerfilPage({
       />
       <HeaderPerfil />
 
-      {/* <GeneralInformation
+      <GeneralInformation
         name={restaurant.name}
         slug={restaurant.slug}
         category={category}
         id={restaurant.id}
-      /> */}
+      />
 
       <EstablishmentContacts
         restaurantId={restaurant.id}
