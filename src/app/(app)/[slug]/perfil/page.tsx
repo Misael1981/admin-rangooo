@@ -46,6 +46,8 @@ export default async function PerfilPage({
     return notFound();
   }
 
+  const category = restaurant.category;
+
   return (
     <div className="space-y-6 px-8 pb-8">
       {/* Breadcrumb */}
@@ -58,7 +60,7 @@ export default async function PerfilPage({
       <GeneralInformation
         name={restaurant.name}
         slug={restaurant.slug}
-        category={restaurant.category}
+        category={category}
         id={restaurant.id}
       />
 
