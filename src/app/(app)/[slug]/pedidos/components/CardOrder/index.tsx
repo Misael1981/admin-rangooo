@@ -3,16 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  CheckCircle,
-  ChefHat,
-  Clock,
-  Package,
-  Truck,
-  UtensilsCrossed,
-  XCircle,
-  LucideIcon,
-} from "lucide-react";
+import { Package, Truck, UtensilsCrossed, LucideIcon } from "lucide-react";
 import { formatCurrency } from "@/helpers/format-currency";
 import {
   Select,
@@ -25,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { ConsumptionMethod, OrderStatus } from "@prisma/client";
-import { OrderDTO } from "@/dtos/order.dto";
+import { CardOrderProps, STATUS_CONFIGS } from "@/constants/maps-options";
 
 // 1. Tipagem das Configurações
 interface MethodConfig {
@@ -39,62 +30,6 @@ const METHOD_CONFIGS: Record<ConsumptionMethod, MethodConfig> = {
   PICKUP: { icon: Package, label: "Retirada", color: "text-green-600" },
   DINE_IN: { icon: UtensilsCrossed, label: "Mesa", color: "text-purple-600" },
 };
-
-interface StatusConfig {
-  variant: "default" | "secondary" | "destructive" | "outline";
-  icon: LucideIcon;
-  label: string;
-  color: string;
-}
-
-const STATUS_CONFIGS: Record<OrderStatus, StatusConfig> = {
-  PENDING: {
-    variant: "secondary",
-    icon: Clock,
-    label: "Pendente",
-    color: "text-amber-600 bg-amber-50",
-  },
-  CONFIRMED: {
-    variant: "default",
-    icon: CheckCircle,
-    label: "Confirmado",
-    color: "text-blue-600 bg-blue-50",
-  },
-  PREPARING: {
-    variant: "default",
-    icon: ChefHat,
-    label: "Em Preparo",
-    color: "text-purple-600 bg-purple-50",
-  },
-  READY_FOR_PICKUP: {
-    variant: "default",
-    icon: Package,
-    label: "Pronto p/ Retirada",
-    color: "text-green-600 bg-green-50",
-  },
-  OUT_FOR_DELIVERY: {
-    variant: "default",
-    icon: Truck,
-    label: "A Caminho",
-    color: "text-orange-600 bg-orange-50",
-  },
-  DELIVERED: {
-    variant: "default",
-    icon: CheckCircle,
-    label: "Entregue",
-    color: "text-green-600 bg-green-50",
-  },
-  CANCELED: {
-    variant: "destructive",
-    icon: XCircle,
-    label: "Cancelado",
-    color: "text-red-600 bg-red-50",
-  },
-};
-
-interface CardOrderProps {
-  order: OrderDTO;
-}
 
 const CardOrder = ({ order }: CardOrderProps) => {
   const router = useRouter();

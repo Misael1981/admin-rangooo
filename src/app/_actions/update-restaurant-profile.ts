@@ -1,7 +1,6 @@
 "use server";
 
 import { db } from "@/lib/prisma";
-import { RestaurantCategory } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const RestaurantCategoryOptions = [
@@ -9,9 +8,7 @@ const RestaurantCategoryOptions = [
   "PIZZARIA",
   "HAMBURGUERIA",
   "SORVETERIA",
-  "ACAI",
-  "SAUDAVEL",
-  "DOCES",
+  "ADEGA",
 ] as const;
 
 type RestaurantCategoryType = (typeof RestaurantCategoryOptions)[number];
