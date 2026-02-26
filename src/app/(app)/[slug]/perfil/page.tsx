@@ -8,11 +8,11 @@ import EstablishmentAddress from "./components/EstablishmentAddress";
 import GalleryWithDescriptionEstablishment from "./components/GalleryWithDescriptionEstablishment";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 
-export default async function PerfilPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function PerfilPage({ params }: PageProps) {
   const { slug } = await params;
 
   const restaurant = await db.restaurant.findUnique({

@@ -1,11 +1,11 @@
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 import Image from "next/image";
 
-export default async function UsuariosPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function UsuariosPage({ params }: PageProps) {
   const { slug } = await params;
 
   return (

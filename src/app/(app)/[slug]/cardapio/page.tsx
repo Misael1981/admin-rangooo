@@ -4,11 +4,11 @@ import ManageMenu from "./components/ManageMenu";
 import { MenuCategoryDTO } from "@/dtos/menu.dto";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 
-export default async function CardapioPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export default async function CardapioPage({ params }: PageProps) {
   const { slug } = await params;
 
   const categories = await getRestaurantMenuBySlug(slug);
