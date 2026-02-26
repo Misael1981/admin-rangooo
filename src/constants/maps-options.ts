@@ -45,3 +45,22 @@ export const STATUS_CONFIGS: Record<OrderStatus, StatusConfig> = {
 export interface CardOrderProps {
   order: OrderDTO;
 }
+
+export const RestaurantCategory = [
+  "RESTAURANT",
+  "PIZZARIA",
+  "HAMBURGUERIA",
+  "SORVETERIA",
+  "ADEGA",
+] as const;
+
+export const CATEGORY_LABELS: Record<
+  (typeof RestaurantCategory)[number],
+  string
+> = {
+  RESTAURANT: "Restaurante",
+  PIZZARIA: "Pizzaria",
+  HAMBURGUERIA: "Hamburgueria",
+  SORVETERIA: "Sorveteria",
+  ADEGA: "Adega",
+};

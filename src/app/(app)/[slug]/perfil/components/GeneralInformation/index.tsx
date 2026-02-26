@@ -12,28 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { CATEGORY_LABELS, RestaurantCategory } from "@/constants/maps-options";
 import { convertToSlug } from "@/helpers/convert-to-slug";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-
-const RestaurantCategory = [
-  "RESTAURANT",
-  "PIZZARIA",
-  "HAMBURGUERIA",
-  "SORVETERIA",
-  "ADEGA",
-] as const;
-
-const CATEGORY_LABELS: Record<(typeof RestaurantCategory)[number], string> = {
-  RESTAURANT: "Restaurante",
-  PIZZARIA: "Pizzaria",
-  HAMBURGUERIA: "Hamburgueria",
-  SORVETERIA: "Sorveteria",
-  ADEGA: "Adega",
-};
 
 const generalInfoSchema = z.object({
   name: z.string().min(2, "Nome obrigatório."),
