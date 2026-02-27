@@ -1,6 +1,15 @@
 import { OrderDTO } from "@/dtos/order.dto";
-import { OrderStatus } from "@prisma/client";
-import { CheckCircle, ChefHat, Clock, LucideIcon, XCircle } from "lucide-react";
+import { ConsumptionMethod, OrderStatus } from "@prisma/client";
+import {
+  CheckCircle,
+  ChefHat,
+  Clock,
+  LucideIcon,
+  Package,
+  Truck,
+  UtensilsCrossed,
+  XCircle,
+} from "lucide-react";
 
 interface StatusConfig {
   variant: "default" | "secondary" | "destructive" | "outline";
@@ -63,4 +72,16 @@ export const CATEGORY_LABELS: Record<
   HAMBURGUERIA: "Hamburgueria",
   SORVETERIA: "Sorveteria",
   ADEGA: "Adega",
+};
+
+export interface MethodConfig {
+  icon: LucideIcon;
+  label: string;
+  color: string;
+}
+
+export const METHOD_CONFIGS: Record<ConsumptionMethod, MethodConfig> = {
+  DELIVERY: { icon: Truck, label: "Entrega", color: "text-blue-600" },
+  PICKUP: { icon: Package, label: "Retirada", color: "text-green-600" },
+  DINE_IN: { icon: UtensilsCrossed, label: "Mesa", color: "text-purple-600" },
 };

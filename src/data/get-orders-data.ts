@@ -41,20 +41,27 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
       user: { select: { name: true, phone: true } },
       totalAmount: true,
       status: true,
+      orderNumber: true,
       consumptionMethod: true,
       createdAt: true,
       deliveryAddress: true,
       items: {
         select: {
           quantity: true,
-          product: { select: { name: true } },
+          product: {
+            select: {
+              name: true,
+              menuCategory: {
+                select: { name: true },
+              },
+            },
+          },
         },
       },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  // Formatação para o Front-end (Sanitização)
   const safeRestaurant = {
     ...restaurant,
     deliveryFee: Number(restaurant.deliveryFee),
@@ -65,6 +72,7 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
     customerName: o.user?.name ?? "Cliente Final",
     customerPhone: o.user?.phone ?? "",
     totalAmount: Number(o.totalAmount),
+    orderNumber: o.orderNumber,
     status: o.status,
     method: o.consumptionMethod,
     createdAt: o.createdAt.toISOString(),
@@ -72,6 +80,7 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
     items: o.items.map((i) => ({
       name: i.product.name,
       quantity: i.quantity,
+      category: i.product.menuCategory.name,
     })),
   }));
 

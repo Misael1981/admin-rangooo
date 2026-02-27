@@ -1,9 +1,12 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Package, Truck, UtensilsCrossed, LucideIcon } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { formatCurrency } from "@/helpers/format-currency";
 import {
   Select,
@@ -15,21 +18,15 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { ConsumptionMethod, OrderStatus } from "@prisma/client";
-import { CardOrderProps, STATUS_CONFIGS } from "@/constants/maps-options";
-
-// 1. Tipagem das Configurações
-interface MethodConfig {
-  icon: LucideIcon;
-  label: string;
-  color: string;
-}
-
-const METHOD_CONFIGS: Record<ConsumptionMethod, MethodConfig> = {
-  DELIVERY: { icon: Truck, label: "Entrega", color: "text-blue-600" },
-  PICKUP: { icon: Package, label: "Retirada", color: "text-green-600" },
-  DINE_IN: { icon: UtensilsCrossed, label: "Mesa", color: "text-purple-600" },
-};
+import { OrderStatus } from "@prisma/client";
+import {
+  CardOrderProps,
+  METHOD_CONFIGS,
+  STATUS_CONFIGS,
+} from "@/constants/maps-options";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
+import OrderReceipt from "../OrderReceipt";
 
 const CardOrder = ({ order }: CardOrderProps) => {
   const router = useRouter();
@@ -43,10 +40,6 @@ const CardOrder = ({ order }: CardOrderProps) => {
   const MethodIcon = methodConfig.icon;
   const statusConfig = STATUS_CONFIGS[order.status];
   const StatusIcon = statusConfig.icon;
-
-  const itemsText = order.items
-    .map((item) => `${item.quantity}x ${item.name}`)
-    .join(" · ");
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
@@ -64,75 +57,111 @@ const CardOrder = ({ order }: CardOrderProps) => {
     }
   };
 
-  if (!isMounted) return null; // Evita erro de hidratação com datas
+  if (!isMounted) return null;
+
+  const handlePrint = () => {
+    // Pode-se usar a lib 'react-to-print'
+    // ou simplesmente disparar o comando:
+    window.print();
+  };
+
+  console.log("O que vem no pedido: ", order);
 
   return (
-    <Card className="w-full max-w-3xl border-2 transition-all hover:border-primary/20">
-      <CardContent className="space-y-3 p-4">
+    <Card className="w-full gap-0 max-w-3xl border-2 transition-all hover:border-primary/20 p-0">
+      <CardHeader className="p-6 border-b gap-0">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Badge
-              variant="outline"
-              className={`${methodConfig.color} border-current`}
-            >
-              <MethodIcon className="mr-1 h-4 w-4" />
-              {methodConfig.label}
-            </Badge>
-            <Badge
-              variant={statusConfig.variant}
-              className={statusConfig.color}
-            >
-              <StatusIcon className="mr-1 h-4 w-4" />
-              {statusConfig.label}
-            </Badge>
+          <div className="flex items-center justify-between lg:w-fit w-full gap-2">
+            <div className="flex flex-col gap-2 items-center">
+              <span className="text-xs font-semibold">Nº do Pedido</span>
+              <Badge>{order.orderNumber}</Badge>
+            </div>
+            <div className="space-x-2">
+              <Badge
+                variant="outline"
+                className={`${methodConfig.color} border-current`}
+              >
+                <MethodIcon className="mr-1 h-4 w-4" />
+                {methodConfig.label}
+              </Badge>
+              <Badge
+                variant={statusConfig.variant}
+                className={statusConfig.color}
+              >
+                <StatusIcon className="mr-1 h-4 w-4" />
+                {statusConfig.label}
+              </Badge>
+            </div>
           </div>
-
-          <Select
-            onValueChange={handleStatusUpdate}
-            defaultValue={order.status}
-          >
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.keys(STATUS_CONFIGS).map((status) => (
-                <SelectItem key={status} value={status}>
-                  {STATUS_CONFIGS[status as OrderStatus].label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="w-full lg:w-fit flex justify-center sm:justify-end">
+            <Select
+              onValueChange={handleStatusUpdate}
+              defaultValue={order.status}
+            >
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(STATUS_CONFIGS).map((status) => (
+                  <SelectItem key={status} value={status}>
+                    {STATUS_CONFIGS[status as OrderStatus].label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
+      </CardHeader>
+      <CardContent className="space-y-4 p-6">
+        {" "}
+        <div className="space-y-3">
+          {order.items.map((item, index) => (
+            <div
+              key={index}
+              className="flex items-start justify-between gap-2 border-b border-dashed pb-2 last:border-0 last:pb-0"
+            >
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                  {item.category || "Geral"}
+                </span>
 
-        <div className="flex items-center justify-between">
-          <p className="line-clamp-1 text-xs text-muted-foreground">
-            {itemsText}
-          </p>
-          <span className="text-sm font-bold text-green-600">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm">{item.quantity}x</span>
+                  <span className="text-sm font-medium">{item.name}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-sm text-muted-foreground font-medium">
+            Total do Pedido
+          </span>
+          <span className="text-lg font-bold text-green-600">
             {formatCurrency(Number(order.totalAmount))}
           </span>
         </div>
-
-        <Separator />
-
-        <div className="flex items-end justify-between">
+      </CardContent>
+      <CardFooter className="border-t p-6 gap-0">
+        <div className="w-full flex flex-wrap gap-6 items-end justify-center sm:justify-between">
           <div className="space-y-1">
             <p className="text-sm font-medium">
               {order.customerName || "Cliente"}
             </p>
             {order.method === "DELIVERY" && order.address && (
               <p className="text-xs text-muted-foreground">
-                {order.address.street}, {order.address.number}
+                {order.address.street}, {order.address.number},{" "}
+                {order.address.neighborhood}
               </p>
             )}
           </div>
-          <p className="text-[10px] text-muted-foreground uppercase">
-            {new Intl.DateTimeFormat("pt-BR", { timeStyle: "short" }).format(
-              new Date(order.createdAt),
-            )}
-          </p>
+          <Button className="w-full sm:w-fit" onClick={handlePrint}>
+            <Printer className="mr-2 h-4 w-4" />
+            Imprimir Pedido
+          </Button>
         </div>
-      </CardContent>
+      </CardFooter>
+      {/* <OrderReceipt order={order} /> */}
     </Card>
   );
 };

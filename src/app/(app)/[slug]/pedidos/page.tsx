@@ -6,46 +6,35 @@ import {
   PAYMENT_METHODS,
   type PaymentMethodValue,
 } from "@/helpers/methods-restaurant-options";
-import { ConsumptionMethod, PaymentMethod } from "@prisma/client";
+import { AreaType, ConsumptionMethod, PaymentMethod } from "@prisma/client";
 import FilterConsumptionMethods from "./components/FilterConsumptionMethods";
 import CardOrder from "./components/CardOrder";
-import { Prisma } from "@prisma/client";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
+import { OrderAddress } from "@/dtos/order.dto";
 
-type OrderAddress = {
-  street: string;
-  number: string;
-  city: string;
-  state: string;
-  neighborhood?: string;
-};
-
-function parseAddress(address: Prisma.JsonValue | null): OrderAddress | null {
+function parseAddress(address: unknown): OrderAddress | null {
   if (!address || typeof address !== "object" || Array.isArray(address)) {
     return null;
   }
 
   const a = address as Record<string, unknown>;
 
-  if (
-    typeof a.street === "string" &&
-    typeof a.number === "string" &&
-    typeof a.city === "string" &&
-    typeof a.state === "string"
-  ) {
+  if (typeof a.street === "string" && typeof a.number === "string") {
     return {
       street: a.street,
       number: a.number,
-      city: a.city,
-      state: a.state,
+      city: typeof a.city === "string" ? a.city : "",
       neighborhood:
         typeof a.neighborhood === "string" ? a.neighborhood : undefined,
+      complement: typeof a.complement === "string" ? a.complement : undefined,
+      reference: typeof a.reference === "string" ? a.reference : undefined,
+      areaType:
+        typeof a.areaType === "string" ? (a.areaType as AreaType) : undefined,
     };
   }
 
   return null;
 }
-
 interface OrdersPageProps {
   params: Promise<{
     slug: string;
@@ -82,6 +71,7 @@ export default async function OrdersPage({
     customerName: order.customerName,
     customerPhone: order.customerPhone,
     totalAmount: Number(order.totalAmount),
+    orderNumber: Number(order.orderNumber),
     status: order.status,
     method: order.method,
     createdAt: order.createdAt,
@@ -120,3 +110,32 @@ export default async function OrdersPage({
     </div>
   );
 }
+
+// ORDEM CRUA DO PRISMA: {
+//   "id": "6475bcd7-ef19-4d62-91d2-1406f4428847",
+//   "user": {
+//     "name": "MISAEL VIEIRA BORGES",
+//     "phone": "35999110933"
+//   },
+//   "totalAmount": "14.99",
+//   "status": "PENDING",
+//   "consumptionMethod": "DELIVERY",
+//   "createdAt": "2026-02-27T12:51:23.535Z",
+//   "deliveryAddress": {
+//     "city": "Congonhal",
+//     "number": "106",
+//     "street": "Julio Fernandes De Morais",
+//     "areaType": "URBAN",
+//     "reference": null,
+//     "complement": null,
+//     "neighborhood": "Bela Vista "
+//   },
+//   "items": [
+//     {
+//       "quantity": 1,
+//       "product": {
+//         "name": "Heineken Long Neck 330ml"
+//       }
+//     }
+//   ]
+// }
