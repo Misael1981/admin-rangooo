@@ -8,6 +8,7 @@ import CardForHeader from "./components/CardForHeader";
 import DailySalesSummary from "./components/DailySalesSummary";
 import { endOfDay, startOfDay } from "date-fns";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
+import NotificationMobile from "@/components/NotificationMobile";
 interface RestaurantPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -57,7 +58,10 @@ export default async function Establishment({ params }: RestaurantPageProps) {
   return (
     <div className="px-8 space-y-8 pb-8">
       {/* Header */}
-      <BreadcrumbComponent currentPage="" slug={slug} />
+      <div className="flex items-center justify-between">
+        <BreadcrumbComponent currentPage="" slug={slug} />
+        <NotificationMobile />
+      </div>
       <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <CardForHeader userName={session.user.name} />
 

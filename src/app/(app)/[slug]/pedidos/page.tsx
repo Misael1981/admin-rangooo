@@ -11,6 +11,7 @@ import FilterConsumptionMethods from "./components/FilterConsumptionMethods";
 import CardOrder from "./components/CardOrder";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 import { OrderAddress } from "@/dtos/order.dto";
+import NotificationMobile from "@/components/NotificationMobile";
 
 function parseAddress(address: unknown): OrderAddress | undefined {
   if (!address || typeof address !== "object" || Array.isArray(address)) {
@@ -83,7 +84,10 @@ export default async function OrdersPage({
   return (
     <div className="space-y-6 px-8 pb-8">
       {/* Breadcrumb */}
-      <BreadcrumbComponent currentPage="Pedidos" slug={slug} />
+      <div className="flex items-center justify-between">
+        <BreadcrumbComponent currentPage="Pedidos" slug={slug} />
+        <NotificationMobile />
+      </div>
       <HeaderOrdersPage totalOrders={orders.length} />
 
       <ConsumptionAndPaymentMethodsForm
