@@ -91,8 +91,9 @@
 }
 
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    margin: 0;
+    size: 58mm auto;
   }
 
   .print-only,
@@ -101,15 +102,19 @@
   }
 
   .print-only {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
+    display: block !important;
+    width: 58mm;
+    margin: 0 auto;
+    font-family: "Courier New", monospace;
+    line-height: 1.2;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
-  @page {
-    margin: 0;
-    size: auto;
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -118,3 +123,12 @@
     display: none;
   }
 }
+
+/* No seu global.css ou num bloco style do componente */
+/* @media print {
+  .print-receipt {
+    width: 58mm;
+    padding: 2mm;
+    margin: 0;
+  }
+} */

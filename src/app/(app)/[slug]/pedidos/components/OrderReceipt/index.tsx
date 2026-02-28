@@ -1,57 +1,131 @@
-import { OrderItemPrintDTO } from "@/dtos/order.dto";
+import { OrderItemDTO } from "@/dtos/order.dto";
 import { formatCurrency } from "@/helpers/format-currency";
+import { AreaType } from "@prisma/client";
 
 type OrderReceiptProps = {
   order: {
     id: string;
     createdAt: string;
     customerName: string;
-    items: OrderItemPrintDTO[];
+    orderNumber: number;
+    items: OrderItemDTO[];
     totalAmount: number;
-    method: string;
+    paymentMethod: string | null;
+    method: "DELIVERY" | "PICKUP" | "DINE_IN";
     address?: {
       street: string;
       number: string;
+      city: string;
+      neighborhood?: string;
+      complement?: string;
+      reference?: string;
+      areaType?: AreaType;
     };
   };
 };
 
-const OrderReceipt = ({ order }: OrderReceiptProps) => (
-  <div className="print-only w-[58mm] p-2 text-[10px] font-mono leading-tight text-black">
-    <div className="text-center font-bold text-lg border-b pb-1 mb-1">
-      RANGOOO
-    </div>
-    <div className="mb-2">
-      <p>PEDIDO: #{order.id.slice(-4)}</p>
-      <p>DATA: {new Date(order.createdAt).toLocaleString("pt-BR")}</p>
-      <p>CLIENTE: {order.customerName}</p>
-    </div>
+const OrderReceipt = ({ order }: OrderReceiptProps) => {
+  const formattedDate = new Date(order.createdAt).toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
-    <div className="border-b border-t py-1">
-      {order.items.map((item) => (
-        <div key={item.id} className="flex justify-between">
-          {/* <span>
-            {item.quantity}x {item.product.name}
-          </span> */}
-          <span>{formatCurrency(item.price)}</span>
-        </div>
-      ))}
-    </div>
-
-    <div className="mt-2 text-right font-bold text-sm">
-      TOTAL: {formatCurrency(order.totalAmount)}
-    </div>
-
-    {order.method === "DELIVERY" && (
-      <div className="mt-2 border-t pt-1">
-        <p className="font-bold">ENTREGA:</p>
-        <p>
-          {order.address?.street}, {order.address?.number}
-        </p>
+  return (
+    <div className="print-only w-[58mm] p-1 text-[9px] font-sans leading-normal text-black">
+      {/* Cabeçalho */}
+      <div className="text-center font-bold text-[11px] uppercase tracking-wider border-b pt-4 pb-1 my-1">
+        SISTEMA RANGOOO
       </div>
-    )}
-    <div className="text-center mt-4 border-t pt-2">*** OBRIGADO! ***</div>
-  </div>
-);
+
+      {/* Info do pedido */}
+      <div className="mb-1.5 space-y-0.5 pt-1">
+        <div className="flex justify-between">
+          <span>PEDIDO:</span>
+          <span className="font-bold">#{order.orderNumber}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>DATA:</span>
+          <span>{formattedDate}</span>
+        </div>
+        <div className="flex">
+          <span className="mr-1">CLIENTE:</span>
+          <span className="flex-1 text-right truncate">
+            {order.customerName}
+          </span>
+        </div>
+      </div>
+
+      {/* Items - tabela alinhada */}
+      <div className="border-t border-b  py-0.5 my-1">
+        <div className="font-bold text-[8px] uppercase flex justify-between mb-0.5">
+          <span>Item</span>
+          <span className="flex gap-2">
+            <span className="w-8 text-right">Qtd</span>
+            <span className="w-12 text-right">Preço</span>
+          </span>
+        </div>
+
+        {order.items.map((item) => (
+          <div
+            key={item.id}
+            className="flex justify-between text-[9px] leading-snug"
+          >
+            <div>
+              <span className="truncate ma-w-30 uppercase">
+                {item.category}
+              </span>
+              <span className="truncate max-w-30">{item.name}</span>
+            </div>
+            <span className="flex gap-2 items-end">
+              <span className="w-8 text-right">{item.quantity}x</span>
+              <span className="w-12 text-right">
+                {formatCurrency(item.price)}
+              </span>
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Total */}
+      <div className="flex justify-between font-bold text-[11px] mt-1 border-b border-black pb-1">
+        <span>TOTAL</span>
+        <span>{formatCurrency(order.totalAmount)}</span>
+      </div>
+
+      <div className="pt-2">
+        <span>FORMA DE PAGAMENTO:</span>
+        <span className="font-bold">{order.paymentMethod}</span>
+      </div>
+
+      {/* Endereço de entrega */}
+      {order.method === "DELIVERY" && order.address && (
+        <div className="mt-1.5 text-[8px]">
+          <span className="font-bold uppercase">Entrega:</span>
+          <span className="p-2 font-bold uppercase">
+            {order.address.areaType}
+          </span>
+          <p className="mt-0.5">
+            {order.address.street}, {order.address.number},{" "}
+            {order.address.neighborhood}
+          </p>
+          {order.address.complement && (
+            <p className="mt-0.5">{order.address.complement}</p>
+          )}
+          {order.address.reference && (
+            <p className="mt-0.5">{order.address.reference}</p>
+          )}
+        </div>
+      )}
+
+      {/* Rodapé */}
+      <div className="text-center mt-2  border-t pt-1 text-[8px] font-bold tracking-widest">
+        *** OBRIGADO! ***
+      </div>
+    </div>
+  );
+};
 
 export default OrderReceipt;

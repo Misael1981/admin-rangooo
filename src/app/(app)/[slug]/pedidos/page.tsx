@@ -12,9 +12,9 @@ import CardOrder from "./components/CardOrder";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 import { OrderAddress } from "@/dtos/order.dto";
 
-function parseAddress(address: unknown): OrderAddress | null {
+function parseAddress(address: unknown): OrderAddress | undefined {
   if (!address || typeof address !== "object" || Array.isArray(address)) {
-    return null;
+    return undefined;
   }
 
   const a = address as Record<string, unknown>;
@@ -33,7 +33,7 @@ function parseAddress(address: unknown): OrderAddress | null {
     };
   }
 
-  return null;
+  return undefined;
 }
 interface OrdersPageProps {
   params: Promise<{
@@ -74,6 +74,7 @@ export default async function OrdersPage({
     orderNumber: Number(order.orderNumber),
     status: order.status,
     method: order.method,
+    paymentMethod: order.paymentMethod,
     createdAt: order.createdAt,
     address: parseAddress(order.address),
     items: order.items,
@@ -110,32 +111,3 @@ export default async function OrdersPage({
     </div>
   );
 }
-
-// ORDEM CRUA DO PRISMA: {
-//   "id": "6475bcd7-ef19-4d62-91d2-1406f4428847",
-//   "user": {
-//     "name": "MISAEL VIEIRA BORGES",
-//     "phone": "35999110933"
-//   },
-//   "totalAmount": "14.99",
-//   "status": "PENDING",
-//   "consumptionMethod": "DELIVERY",
-//   "createdAt": "2026-02-27T12:51:23.535Z",
-//   "deliveryAddress": {
-//     "city": "Congonhal",
-//     "number": "106",
-//     "street": "Julio Fernandes De Morais",
-//     "areaType": "URBAN",
-//     "reference": null,
-//     "complement": null,
-//     "neighborhood": "Bela Vista "
-//   },
-//   "items": [
-//     {
-//       "quantity": 1,
-//       "product": {
-//         "name": "Heineken Long Neck 330ml"
-//       }
-//     }
-//   ]
-// }

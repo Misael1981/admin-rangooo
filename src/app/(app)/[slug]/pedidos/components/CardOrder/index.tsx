@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { OrderStatus } from "@prisma/client";
 import {
   CardOrderProps,
@@ -27,16 +27,23 @@ import {
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import OrderReceipt from "../OrderReceipt";
+import { useReactToPrint } from "react-to-print";
 
 const CardOrder = ({ order }: CardOrderProps) => {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef,
+    documentTitle: `Pedido_${order.orderNumber}`,
+  });
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const methodConfig = METHOD_CONFIGS[order.method];
+  const methodConfig = METHOD_CONFIGS[order.method!];
   const MethodIcon = methodConfig.icon;
   const statusConfig = STATUS_CONFIGS[order.status];
   const StatusIcon = statusConfig.icon;
@@ -59,110 +66,113 @@ const CardOrder = ({ order }: CardOrderProps) => {
 
   if (!isMounted) return null;
 
-  const handlePrint = () => {
-    // Pode-se usar a lib 'react-to-print'
-    // ou simplesmente disparar o comando:
-    window.print();
-  };
-
-  console.log("O que vem no pedido: ", order);
-
   return (
-    <Card className="w-full gap-0 max-w-3xl border-2 transition-all hover:border-primary/20 p-0">
-      <CardHeader className="p-6 border-b gap-0">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center justify-between lg:w-fit w-full gap-2">
-            <div className="flex flex-col gap-2 items-center">
-              <span className="text-xs font-semibold">Nº do Pedido</span>
-              <Badge>{order.orderNumber}</Badge>
-            </div>
-            <div className="space-x-2">
-              <Badge
-                variant="outline"
-                className={`${methodConfig.color} border-current`}
-              >
-                <MethodIcon className="mr-1 h-4 w-4" />
-                {methodConfig.label}
-              </Badge>
-              <Badge
-                variant={statusConfig.variant}
-                className={statusConfig.color}
-              >
-                <StatusIcon className="mr-1 h-4 w-4" />
-                {statusConfig.label}
-              </Badge>
-            </div>
-          </div>
-          <div className="w-full lg:w-fit flex justify-center sm:justify-end">
-            <Select
-              onValueChange={handleStatusUpdate}
-              defaultValue={order.status}
-            >
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.keys(STATUS_CONFIGS).map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {STATUS_CONFIGS[status as OrderStatus].label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4 p-6">
-        {" "}
-        <div className="space-y-3">
-          {order.items.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-start justify-between gap-2 border-b border-dashed pb-2 last:border-0 last:pb-0"
-            >
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                  {item.category || "Geral"}
-                </span>
-
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm">{item.quantity}x</span>
-                  <span className="text-sm font-medium">{item.name}</span>
-                </div>
+    <>
+      <Card className="w-full gap-0 max-w-3xl border-2 transition-all hover:border-primary/20 p-0">
+        <CardHeader className="p-6 border-b gap-0">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center justify-between lg:w-fit w-full gap-2">
+              <div className="flex flex-col gap-2 items-center">
+                <span className="text-xs font-semibold">Nº do Pedido</span>
+                <Badge>{order.orderNumber}</Badge>
+              </div>
+              <div className="space-x-2">
+                <Badge
+                  variant="outline"
+                  className={`${methodConfig.color} border-current`}
+                >
+                  <MethodIcon className="mr-1 h-4 w-4" />
+                  {methodConfig.label}
+                </Badge>
+                <Badge
+                  variant={statusConfig.variant}
+                  className={statusConfig.color}
+                >
+                  <StatusIcon className="mr-1 h-4 w-4" />
+                  {statusConfig.label}
+                </Badge>
               </div>
             </div>
-          ))}
-        </div>
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-sm text-muted-foreground font-medium">
-            Total do Pedido
-          </span>
-          <span className="text-lg font-bold text-green-600">
-            {formatCurrency(Number(order.totalAmount))}
-          </span>
-        </div>
-      </CardContent>
-      <CardFooter className="border-t p-6 gap-0">
-        <div className="w-full flex flex-wrap gap-6 items-end justify-center sm:justify-between">
-          <div className="space-y-1">
-            <p className="text-sm font-medium">
-              {order.customerName || "Cliente"}
-            </p>
-            {order.method === "DELIVERY" && order.address && (
-              <p className="text-xs text-muted-foreground">
-                {order.address.street}, {order.address.number},{" "}
-                {order.address.neighborhood}
-              </p>
-            )}
+            <div className="w-full lg:w-fit flex justify-center sm:justify-end">
+              <Select
+                onValueChange={handleStatusUpdate}
+                defaultValue={order.status}
+              >
+                <SelectTrigger className="w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(STATUS_CONFIGS).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {STATUS_CONFIGS[status as OrderStatus].label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-          <Button className="w-full sm:w-fit" onClick={handlePrint}>
-            <Printer className="mr-2 h-4 w-4" />
-            Imprimir Pedido
-          </Button>
+        </CardHeader>
+        <CardContent className="space-y-4 p-6">
+          {" "}
+          <div className="space-y-3">
+            {order.items.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-start justify-between gap-2 border-b border-dashed pb-2 last:border-0 last:pb-0"
+              >
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    {item.category || "Geral"}
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm">{item.quantity}x</span>
+                    <span className="text-sm font-medium">{item.name}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-sm text-muted-foreground font-medium">
+              Total do Pedido
+            </span>
+            <span className="text-lg font-bold text-green-600">
+              {formatCurrency(Number(order.totalAmount))}
+            </span>
+          </div>
+        </CardContent>
+        <CardFooter className="border-t p-6 gap-0">
+          <div className="w-full flex flex-wrap gap-6 items-end justify-center sm:justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-medium">
+                {order.customerName || "Cliente"}
+              </p>
+              {order.method === "DELIVERY" && order.address && (
+                <p className="text-xs text-muted-foreground">
+                  {order.address.street}, {order.address.number},{" "}
+                  {order.address.neighborhood}
+                </p>
+              )}
+            </div>
+            <Button className="w-full sm:w-fit" onClick={() => handlePrint()}>
+              <Printer className="mr-2 h-4 w-4" />
+              Imprimir Pedido
+            </Button>
+          </div>
+        </CardFooter>
+      </Card>
+      <div className="hidden">
+        <div ref={contentRef}>
+          <OrderReceipt
+            order={{
+              ...order,
+              paymentMethod: order.paymentMethod ?? "NÃO INFORMADO",
+            }}
+          />
         </div>
-      </CardFooter>
-      {/* <OrderReceipt order={order} /> */}
-    </Card>
+      </div>
+    </>
   );
 };
 

@@ -45,9 +45,12 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
       consumptionMethod: true,
       createdAt: true,
       deliveryAddress: true,
+      paymentMethod: true,
       items: {
         select: {
+          id: true,
           quantity: true,
+          priceAtOrder: true,
           product: {
             select: {
               name: true,
@@ -75,11 +78,13 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
     orderNumber: o.orderNumber,
     status: o.status,
     method: o.consumptionMethod,
+    paymentMethod: o.paymentMethod,
     createdAt: o.createdAt.toISOString(),
     address: o.deliveryAddress,
     items: o.items.map((i) => ({
       name: i.product.name,
       quantity: i.quantity,
+      price: Number(i.priceAtOrder),
       category: i.product.menuCategory.name,
     })),
   }));
