@@ -1,5 +1,6 @@
 import { db } from "@/lib/prisma";
 import { ConsumptionMethod } from "@prisma/client";
+import { id } from "date-fns/locale";
 
 export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
   const restaurant = await db.restaurant.findUnique({
@@ -82,6 +83,7 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
     createdAt: o.createdAt.toISOString(),
     address: o.deliveryAddress,
     items: o.items.map((i) => ({
+      id: i.id,
       name: i.product.name,
       quantity: i.quantity,
       price: Number(i.priceAtOrder),
