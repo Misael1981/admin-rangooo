@@ -1,6 +1,10 @@
+import { getAllEstablishments } from "@/data/get-all-establishments";
 import { LayoutDashboard } from "lucide-react";
+import SearchEstablishments from "./components/SearchEstablishments";
 
-export default function RangoooPage() {
+export default async function RangoooPage() {
+  const establishments = await getAllEstablishments();
+
   return (
     <div className="space-y-6 px-4 lg:px-8 pb-8">
       <header>
@@ -13,6 +17,7 @@ export default function RangoooPage() {
           </h1>
         </div>
       </header>
+      <SearchEstablishments establishments={establishments} />
     </div>
   );
 }

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rangooo Admin",
+  title: "Admin Rangooo",
   description:
     "Seu delivery mais rápido, seu negócio mais organizado. O Rangooo cuida de tudo.",
   icons: {
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Rangooo Admin",
+    title: "Admin Rangooo",
   },
   formatDetection: {
     telephone: false,

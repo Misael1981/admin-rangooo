@@ -71,20 +71,30 @@ const OrderReceipt = ({ order }: OrderReceiptProps) => {
         {order.items.map((item) => (
           <div
             key={item.id}
-            className="flex justify-between text-[9px] leading-snug"
+            className="flex items-center justify-between gap-2 border-b border-dashed border-gray-100 py-1 text-[9px] leading-tight"
           >
-            <div>
-              <span className="truncate ma-w-30 uppercase">
-                {item.category}
-              </span>
-              <span className="truncate max-w-30">{item.name}</span>
+            {/* Lado Esquerdo: Quantidade e Nome/Categoria */}
+            <div className="flex flex-1 items-center gap-1 overflow-hidden">
+              <div className="flex flex-col">
+                <span className="text-[7px] text-gray-500 uppercase leading-none">
+                  {item.category}
+                </span>
+                <span className="wrap-break-word font-medium">{item.name}</span>
+              </div>
+              <span className="font-bold min-w-4">{item.quantity}x</span>
             </div>
-            <span className="flex gap-2 items-end">
-              <span className="w-8 text-right">{item.quantity}x</span>
-              <span className="w-12 text-right">
-                {formatCurrency(item.price)}
+
+            {/* Lado Direito: Preço Unitário ou Total */}
+            <div className="flex flex-col items-end min-w-12">
+              <span className="whitespace-nowrap">
+                {formatCurrency(item.price * item.quantity)}
               </span>
-            </span>
+              {item.quantity > 1 && (
+                <span className="text-[7px] text-gray-400">
+                  ({formatCurrency(item.price)} un)
+                </span>
+              )}
+            </div>
           </div>
         ))}
       </div>
