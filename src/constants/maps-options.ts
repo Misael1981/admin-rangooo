@@ -1,5 +1,5 @@
 import { OrderDTO } from "@/dtos/order.dto";
-import { ConsumptionMethod, OrderStatus } from "@prisma/client";
+import { ConsumptionMethod, OrderStatus, PlanType } from "@prisma/client";
 import {
   CheckCircle,
   ChefHat,
@@ -85,3 +85,27 @@ export const METHOD_CONFIGS: Record<ConsumptionMethod, MethodConfig> = {
   PICKUP: { icon: Package, label: "Retirada", color: "text-green-600" },
   DINE_IN: { icon: UtensilsCrossed, label: "Mesa", color: "text-purple-600" },
 };
+
+export type PlanDetail = {
+  id: PlanType;
+  title: string;
+  description: string;
+  features: string[]; // Dica: adicionei isso pra você listar os benefícios!
+};
+
+export const PLANS_DETAILS: PlanDetail[] = [
+  {
+    id: PlanType.BASICO,
+    title: "Plano Básico",
+    description:
+      "Ideal para estabelecimentos que estão começando e desejam uma presença online simples. Inclui recursos essenciais para gerenciar seu cardápio, pedidos e clientes.",
+    features: ["Cardápio Digital", "Gestão de Pedidos", "Entrega Própria"],
+  },
+  {
+    id: PlanType.PRO,
+    title: "Plano Pro",
+    description:
+      "Nesse plano o estabelecimento tem acesso às entregas do Rangooo Entregas. O pedido chega direto para nossos entregadores parceiros, que cuidam de tudo para você.",
+    features: ["Tudo do Básico", "Logística Rangooo", "Maior Visibilidade"],
+  },
+];

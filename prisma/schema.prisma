@@ -156,12 +156,18 @@ model Restaurant {
   printerStatus       String?                       @default("disconnected")
   printerType         String?
   printingToken       String?                       @unique
-  deliveryFee         Decimal?                      @db.Decimal(6, 2)
   
   isConfigured        Boolean                       @default(false)
   onboardingStep      Int                           @default(1)
   onboardingCompleted Boolean                       @default(false)
   publishedAt         DateTime?
+  imagePublicId       String?
+
+  deliveryFee         Decimal?                      @db.Decimal(6, 2)
+  useRangoooDelivery  Boolean                       @default(false)
+  deliveryAreas       DeliveryArea[]  
+  plan                PlanType                      @default(BASICO)
+
   businessHours       BusinessHours[]
   contacts            ContactNumber[]
   menuCategories      MenuCategory[]
@@ -173,6 +179,24 @@ model Restaurant {
   users               RestaurantUser[]
 
   @@index([ownerId])
+}
+
+model DeliveryArea {
+  id           String     @id @default(cuid())
+  restaurantId String
+  areaType     AreaType
+  fee          Int        @default(0) 
+  
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, areaType]) 
+}
+
+model SystemSettings {
+  id                String   @id @default("global")
+  urbanDeliveryFee  Int      @default(800) 
+  ruralDeliveryFee  Int      @default(1500) 
+  districtDeliveryFee Int    @default(1500) 
 }
 
 model RestaurantUser {
@@ -296,6 +320,8 @@ model Order {
   restaurantId      String
   totalAmount       Decimal           @db.Decimal(10, 2)
   deliveryFee       Decimal           @default(0) @db.Decimal(6, 2)
+  status            OrderStatus       @default(PENDING)
+  consumptionMethod ConsumptionMethod @default(DELIVERY)
   deliveryAddress   Json?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
@@ -303,9 +329,6 @@ model Order {
   extras            String?
   orderNumber       Int?
   printId           String?
-  paymentMethod     String?
-  status            OrderStatus       @default(PENDING)
-  consumptionMethod ConsumptionMethod @default(DELIVERY)
   restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
@@ -401,4 +424,9 @@ enum AreaType {
   URBAN
   RURAL
   DISTRICT
+}
+
+enum PlanType {
+  BASICO
+  PRO
 }

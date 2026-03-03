@@ -7,6 +7,7 @@ import {
   Search,
   Settings,
   ShoppingBasket,
+  SlidersHorizontal,
   Store,
   Users,
   Warehouse,
@@ -50,6 +51,11 @@ export function AppSidebar() {
       title: "Perfil do Estabelecimento",
       url: `/${slug}/perfil`,
       icon: Store,
+    },
+    {
+      title: "Plano e Métodos",
+      url: `/${slug}/plano-metodos`,
+      icon: SlidersHorizontal,
     },
     {
       title: "Gerenciar Cardápio",

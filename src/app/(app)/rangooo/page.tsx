@@ -21,3 +21,4 @@ export default async function RangoooPage() {
     </div>
   );
 }
+//get-delivery-prices.ts

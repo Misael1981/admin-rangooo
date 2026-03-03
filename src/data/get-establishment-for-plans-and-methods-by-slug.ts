@@ -1,0 +1,62 @@
+import { db } from "@/lib/prisma";
+import { PlanType, AreaType } from "@prisma/client";
+
+export type EstablishmentPlansMethods = {
+  id: string;
+  name: string;
+  slug: string;
+  plan: PlanType;
+  useRangoooDelivery: boolean;
+  deliveryAreas: {
+    areaType: AreaType;
+    fee: number;
+  }[];
+  systemSettings: {
+    URBAN: number;
+    RURAL: number;
+    DISTRICT: number;
+  } | null;
+};
+
+export async function getEstablishmentForPlansAndMethodsBySlug(
+  slug: string,
+): Promise<EstablishmentPlansMethods | null> {
+  try {
+    const establishment = await db.restaurant.findUnique({
+      where: { slug },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        plan: true,
+        useRangoooDelivery: true,
+        deliveryAreas: {
+          select: {
+            areaType: true,
+            fee: true,
+          },
+        },
+      },
+    });
+
+    if (!establishment) return null;
+
+    const settings = await db.systemSettings.findUnique({
+      where: { id: "global" },
+    });
+
+    return {
+      ...establishment,
+      systemSettings: settings
+        ? {
+            URBAN: settings.urbanDeliveryFee,
+            RURAL: settings.ruralDeliveryFee,
+            DISTRICT: settings.districtDeliveryFee,
+          }
+        : null,
+    };
+  } catch (err) {
+    console.error("Erro ao buscar dados completos:", err);
+    return null;
+  }
+}
