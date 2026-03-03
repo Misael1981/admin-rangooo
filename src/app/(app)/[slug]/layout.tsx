@@ -20,7 +20,7 @@ export default async function RestaurantLayout({
     <div className="flex h-screen flex-col">
       <OrderNotificationTrigger restaurantId={restaurant.id} />
 
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <div>{children}</div>
     </div>
   );
 }

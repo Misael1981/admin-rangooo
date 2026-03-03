@@ -1,7 +1,7 @@
 import { getOrdersData } from "@/data/get-orders-data";
 import HeaderOrdersPage from "./components/HeaderOrdersPage";
 import { notFound } from "next/navigation";
-import ConsumptionAndPaymentMethodsForm from "./components/ConsumptionAndPaymentMethodsForm";
+import ConsumptionAndPaymentMethodsForm from "../plano-metodos/components/ConsumptionAndPaymentMethodsForm";
 import {
   PAYMENT_METHODS,
   type PaymentMethodValue,
@@ -90,7 +90,7 @@ export default async function OrdersPage({
       </div>
       <HeaderOrdersPage totalOrders={orders.length} />
 
-      <ConsumptionAndPaymentMethodsForm
+      {/* <ConsumptionAndPaymentMethodsForm
         initialConsumptionMethods={restaurant.consumptionMethods.map(
           (m) => m.method,
         )}
@@ -101,7 +101,7 @@ export default async function OrdersPage({
           )}
         restaurantId={restaurant.id}
         deliveryFee={restaurant.deliveryFee}
-      />
+      /> */}
 
       <FilterConsumptionMethods
         consumptionMethods={restaurant.consumptionMethods}

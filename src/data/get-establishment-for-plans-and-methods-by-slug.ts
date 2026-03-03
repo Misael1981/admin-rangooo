@@ -1,5 +1,10 @@
 import { db } from "@/lib/prisma";
-import { PlanType, AreaType } from "@prisma/client";
+import {
+  PlanType,
+  AreaType,
+  PaymentMethod,
+  ConsumptionMethod,
+} from "@prisma/client";
 
 export type EstablishmentPlansMethods = {
   id: string;
@@ -16,6 +21,12 @@ export type EstablishmentPlansMethods = {
     RURAL: number;
     DISTRICT: number;
   } | null;
+  consumptionMethods: {
+    method: ConsumptionMethod;
+  }[];
+  paymentMethods: {
+    method: PaymentMethod;
+  }[];
 };
 
 export async function getEstablishmentForPlansAndMethodsBySlug(
@@ -34,6 +45,16 @@ export async function getEstablishmentForPlansAndMethodsBySlug(
           select: {
             areaType: true,
             fee: true,
+          },
+        },
+        consumptionMethods: {
+          select: {
+            method: true,
+          },
+        },
+        paymentMethods: {
+          select: {
+            method: true,
           },
         },
       },

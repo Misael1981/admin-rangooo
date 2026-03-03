@@ -112,7 +112,7 @@ const PlansSection = ({
   /* ---------------------------------- */
 
   return (
-    <Card className="w-full sm:max-w-md md:max-w-xl lg:max-w-2xl">
+    <Card className="w-full shadow-lg sm:max-w-md md:max-w-xl lg:max-w-2xl">
       <CardHeader>
         <CardTitle>Configurações de Plano e Entrega</CardTitle>
         <CardDescription>Gerencie como sua logística funciona.</CardDescription>

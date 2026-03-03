@@ -4,6 +4,7 @@ import { SlidersHorizontal } from "lucide-react";
 import PlansSection from "./components/PlansSection";
 import { getEstablishmentForPlansAndMethodsBySlug } from "@/data/get-establishment-for-plans-and-methods-by-slug";
 import { notFound } from "next/navigation";
+import ConsumptionAndPaymentMethodsForm from "./components/ConsumptionAndPaymentMethodsForm";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -18,8 +19,14 @@ export default async function PlanoMetodosPage({ params }: PageProps) {
     return notFound();
   }
 
-  const { plan, useRangoooDelivery, deliveryAreas, systemSettings } =
-    establishment;
+  const {
+    plan,
+    useRangoooDelivery,
+    deliveryAreas,
+    systemSettings,
+    consumptionMethods,
+    paymentMethods,
+  } = establishment;
 
   return (
     <div className="space-y-6 px-8 pb-8">
@@ -40,6 +47,13 @@ export default async function PlanoMetodosPage({ params }: PageProps) {
           useRangoooDelivery={useRangoooDelivery}
           deliveryAreas={deliveryAreas}
           systemSettings={systemSettings}
+          restaurantId={establishment.id}
+          slug={slug}
+        />
+
+        <ConsumptionAndPaymentMethodsForm
+          initialConsumptionMethods={consumptionMethods.map((m) => m.method)}
+          initialPaymentMethods={paymentMethods.map((m) => m.method)}
           restaurantId={establishment.id}
           slug={slug}
         />

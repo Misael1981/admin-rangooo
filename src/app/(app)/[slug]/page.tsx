@@ -17,8 +17,6 @@ export default async function Establishment({ params }: RestaurantPageProps) {
   const { slug } = await params;
   const session = await getServerSession(authOptions);
 
-  console.log(session?.user);
-
   if (!session?.user) {
     redirect("/");
   }

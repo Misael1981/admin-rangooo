@@ -6,27 +6,19 @@ import { revalidatePath } from "next/cache";
 
 interface UpdateMethodsParams {
   restaurantId: string;
+  slug: string;
   consumptionMethods: ConsumptionMethod[];
   paymentMethods: PaymentMethod[];
-  deliveryFee?: number;
 }
 
 export async function updateRestaurantMethods({
   restaurantId,
+  slug,
   consumptionMethods,
   paymentMethods,
-  deliveryFee,
 }: UpdateMethodsParams) {
   try {
-    const resolvedDeliveryFee = consumptionMethods.includes("DELIVERY")
-      ? (deliveryFee ?? 0)
-      : 0;
-
     await db.$transaction([
-      db.restaurant.update({
-        where: { id: restaurantId },
-        data: { deliveryFee: resolvedDeliveryFee },
-      }),
       db.restaurantConsumptionMethod.deleteMany({ where: { restaurantId } }),
       db.restaurantConsumptionMethod.createMany({
         data: consumptionMethods.map((method, idx) => ({
@@ -35,8 +27,8 @@ export async function updateRestaurantMethods({
           isActive: true,
           displayOrder: idx,
         })),
-        skipDuplicates: true,
       }),
+
       db.restaurantPaymentMethod.deleteMany({ where: { restaurantId } }),
       db.restaurantPaymentMethod.createMany({
         data: paymentMethods.map((method, idx) => ({
@@ -45,18 +37,17 @@ export async function updateRestaurantMethods({
           isActive: true,
           displayOrder: idx,
         })),
-        skipDuplicates: true,
       }),
     ]);
 
-    revalidatePath(`/(admin)/[slug]/orders`);
+    revalidatePath(`/${slug}/plano-metodos`);
 
     return { success: true };
   } catch (error) {
-    console.error("Erro na Server Action:", error);
+    console.error("Erro na Server Action de Métodos:", error);
     return {
       success: false,
-      error: "Falha ao atualizar configurações no banco.",
+      error: "Falha ao atualizar métodos de pagamento e consumo.",
     };
   }
 }

@@ -21,33 +21,21 @@ import {
   type ConsumptionMethodValue,
   type PaymentMethodValue,
 } from "@/helpers/methods-restaurant-options";
-import { Input } from "@/components/ui/input";
 import { updateRestaurantMethods } from "@/app/_actions/update-restaurant-methods";
 
-// 1. Ajuste do Schema para aceitar apenas os valores dos helpers
-const methodsSchema = z
-  .object({
-    consumptionMethods: z.array(
-      z.enum(["DINE_IN", "PICKUP", "DELIVERY"] as const),
-    ),
-    paymentMethods: z.array(
-      z.enum(["CASH", "PIX", "CREDIT_CARD", "DEBIT_CARD"] as const),
-    ),
-    deliveryFee: z.coerce
-      .number()
-      .min(0)
-      .optional()
-      .transform((v) => (Number.isNaN(v) ? undefined : v)),
-  })
-  .refine(
-    (data) =>
-      !data.consumptionMethods.includes("DELIVERY") ||
-      (data.deliveryFee ?? 0) > 0,
-    {
-      message: "Informe o valor do frete para entrega",
-      path: ["deliveryFee"],
-    },
-  );
+const methodsSchema = z.object({
+  consumptionMethods: z.array(
+    z.enum(["DINE_IN", "PICKUP", "DELIVERY"] as const),
+  ),
+  paymentMethods: z.array(
+    z.enum(["CASH", "PIX", "CREDIT_CARD", "DEBIT_CARD"] as const),
+  ),
+  deliveryFee: z.coerce
+    .number()
+    .min(0)
+    .optional()
+    .transform((v) => (Number.isNaN(v) ? undefined : v)),
+});
 
 type MethodsFormData = z.infer<typeof methodsSchema>;
 
@@ -55,21 +43,20 @@ interface ConsumptionAndPaymentMethodsFormProps {
   initialConsumptionMethods: ConsumptionMethodValue[];
   initialPaymentMethods: PaymentMethodValue[];
   restaurantId: string;
-  deliveryFee: number;
+  slug: string;
 }
 
 const ConsumptionAndPaymentMethodsForm = ({
   initialConsumptionMethods,
   initialPaymentMethods,
   restaurantId,
-  deliveryFee,
+  slug,
 }: ConsumptionAndPaymentMethodsFormProps) => {
   const form = useForm({
     resolver: zodResolver(methodsSchema),
     defaultValues: {
       consumptionMethods: initialConsumptionMethods,
       paymentMethods: initialPaymentMethods,
-      deliveryFee,
     },
   });
 
@@ -78,6 +65,7 @@ const ConsumptionAndPaymentMethodsForm = ({
       const result = await updateRestaurantMethods({
         ...data,
         restaurantId,
+        slug,
       });
 
       if (result.success) {
@@ -93,7 +81,7 @@ const ConsumptionAndPaymentMethodsForm = ({
 
   return (
     <section className="w-full ">
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-2xl border border-gray-300">
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg border border-gray-300">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FieldGroup className="flex flex-col gap-8 md:flex-row justify-center">
             {/* SEÇÃO: MÉTODOS DE CONSUMO */}
@@ -135,26 +123,6 @@ const ConsumptionAndPaymentMethodsForm = ({
                         </FieldLabel>
                       </Field>
                     ))}
-                    {field.value.includes("DELIVERY") && (
-                      <Field>
-                        <FieldLabel>Valor da entrega</FieldLabel>
-
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                            R$
-                          </span>
-
-                          <Input
-                            type="number"
-                            step="0.01"
-                            className="pl-10 border border-gray-300"
-                            {...form.register("deliveryFee", {
-                              valueAsNumber: true,
-                            })}
-                          />
-                        </div>
-                      </Field>
-                    )}
                   </FieldGroup>
                 )}
               />
