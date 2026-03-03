@@ -3,6 +3,7 @@
 import {
   ClipboardList,
   ClipboardPenLine,
+  Clock3,
   Home,
   Search,
   Settings,
@@ -56,6 +57,11 @@ export function AppSidebar() {
       title: "Plano e Métodos",
       url: `/${slug}/plano-metodos`,
       icon: SlidersHorizontal,
+    },
+    {
+      title: "Horários de Funcionamento",
+      url: `/${slug}/horarios-funcionamento`,
+      icon: Clock3,
     },
     {
       title: "Gerenciar Cardápio",
