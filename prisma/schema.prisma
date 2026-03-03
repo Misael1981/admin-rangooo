@@ -320,8 +320,6 @@ model Order {
   restaurantId      String
   totalAmount       Decimal           @db.Decimal(10, 2)
   deliveryFee       Decimal           @default(0) @db.Decimal(6, 2)
-  status            OrderStatus       @default(PENDING)
-  consumptionMethod ConsumptionMethod @default(DELIVERY)
   deliveryAddress   Json?
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
@@ -329,6 +327,9 @@ model Order {
   extras            String?
   orderNumber       Int?
   printId           String?
+  paymentMethod     String?
+  consumptionMethod ConsumptionMethod @default(DELIVERY)
+  status            OrderStatus       @default(PENDING)
   restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]

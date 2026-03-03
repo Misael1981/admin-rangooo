@@ -1,12 +1,7 @@
 import { getOrdersData } from "@/data/get-orders-data";
 import HeaderOrdersPage from "./components/HeaderOrdersPage";
 import { notFound } from "next/navigation";
-import ConsumptionAndPaymentMethodsForm from "../plano-metodos/components/ConsumptionAndPaymentMethodsForm";
-import {
-  PAYMENT_METHODS,
-  type PaymentMethodValue,
-} from "@/helpers/methods-restaurant-options";
-import { AreaType, ConsumptionMethod, PaymentMethod } from "@prisma/client";
+import { AreaType, ConsumptionMethod } from "@prisma/client";
 import FilterConsumptionMethods from "./components/FilterConsumptionMethods";
 import CardOrder from "./components/CardOrder";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
@@ -42,10 +37,6 @@ interface OrdersPageProps {
   }>;
   searchParams: Promise<{ consumptionMethod?: string }>;
 }
-
-const allowedPaymentMethods = new Set<PaymentMethod>(
-  PAYMENT_METHODS.map((m) => m.value),
-);
 
 export default async function OrdersPage({
   params,
@@ -89,19 +80,6 @@ export default async function OrdersPage({
         <NotificationMobile />
       </div>
       <HeaderOrdersPage totalOrders={orders.length} />
-
-      {/* <ConsumptionAndPaymentMethodsForm
-        initialConsumptionMethods={restaurant.consumptionMethods.map(
-          (m) => m.method,
-        )}
-        initialPaymentMethods={restaurant.paymentMethods
-          .map((m) => m.method)
-          .filter((method): method is PaymentMethodValue =>
-            allowedPaymentMethods.has(method),
-          )}
-        restaurantId={restaurant.id}
-        deliveryFee={restaurant.deliveryFee}
-      /> */}
 
       <FilterConsumptionMethods
         consumptionMethods={restaurant.consumptionMethods}
