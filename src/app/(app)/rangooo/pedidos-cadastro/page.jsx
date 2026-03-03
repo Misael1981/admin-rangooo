@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { ClipboardPenLine } from "lucide-react";
 import HeaderPages from "../components/HeaderPages";
 import { getLeads } from "@/data/rangooo/get-leads";

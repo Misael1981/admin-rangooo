@@ -33,10 +33,8 @@ type LeadProps = {
 const LeadCard = ({ lead }: LeadProps) => {
   const [isPending, startTransition] = useTransition();
 
-  // Função auxiliar para abrir o WhatsApp
   const openWhatsApp = (phone: string, text: string) => {
     const cleanPhone = phone.replace(/\D/g, "");
-    // Garante que tenha o código do país se não tiver
     const finalPhone = cleanPhone.startsWith("55")
       ? cleanPhone
       : `55${cleanPhone}`;
@@ -63,7 +61,7 @@ const LeadCard = ({ lead }: LeadProps) => {
 
   const handleReject = () => {
     startTransition(async () => {
-      const result = await rejectLead(lead.id); // Certifique-se que essa action existe
+      const result = await rejectLead(lead.id);
 
       if (result.error) {
         toast.error(result.error);
@@ -98,7 +96,6 @@ const LeadCard = ({ lead }: LeadProps) => {
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* ... Seus ícones de Mail, Phone, MapPin continuam iguais ... */}
         <ul className="space-y-1">
           <li className="flex items-center gap-2 text-sm">
             <Mail className="h-4 w-4 text-gray-400" />
