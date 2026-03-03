@@ -7,10 +7,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { uploadToCloudinary } from "@/app/_actions/upload-cloudinary";
 import { toast } from "sonner";
 import { updateGalleryDescription } from "@/app/_actions/update-gallery-description";
 import ImageUpload from "@/components/ImageUpload";
+import imageCompression from "browser-image-compression";
 
 type GalleryWithDescriptionValue = z.infer<typeof galleryWithDescriptionSchema>;
 
@@ -46,21 +46,76 @@ const GalleryWithDescriptionEstablishment = ({
     },
   });
 
+  const uploadToCloudinaryClient = async (file: File) => {
+    const options = {
+      maxSizeMB: 0.7,
+      maxWidthOrHeight: 1080,
+      useWebWorker: true,
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+
+      const formData = new FormData();
+      formData.append("file", compressedFile);
+      formData.append(
+        "upload_preset",
+        process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!,
+      );
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const data = await response.json();
+      return {
+        url: data.secure_url,
+        publicId: data.public_id,
+      };
+    } catch (error) {
+      console.error("Erro na compressão ou upload:", error);
+      throw error;
+    }
+  };
+
   const onSubmit = async (data: GalleryWithDescriptionValue) => {
     try {
-      let finalAvatarUrl = avatarImageUrl;
-      let finalCoverUrl = coverImageUrl;
+      let finalAvatarUrl = avatarImageUrl as string;
+      let finalCoverUrl = coverImageUrl as string;
 
+      // Fazer upload da imagem de perfil se for um arquivo
       if (data.avatarImageUrl instanceof File) {
-        const res = await uploadToCloudinary(data.avatarImageUrl);
-        if (res) finalAvatarUrl = res.url;
+        try {
+          const uploadResult = await uploadToCloudinaryClient(
+            data.avatarImageUrl,
+          );
+          finalAvatarUrl = uploadResult.url;
+        } catch (err) {
+          toast.error("Falha ao subir a imagem de perfil para a nuvem.");
+          console.error("Erro ao subir avatar:", err);
+          return;
+        }
       }
 
+      // Fazer upload da imagem de capa se for um arquivo
       if (data.coverImageUrl instanceof File) {
-        const res = await uploadToCloudinary(data.coverImageUrl);
-        if (res) finalCoverUrl = res.url;
+        try {
+          const uploadResult = await uploadToCloudinaryClient(
+            data.coverImageUrl,
+          );
+          finalCoverUrl = uploadResult.url;
+        } catch (err) {
+          toast.error("Falha ao subir a imagem de capa para a nuvem.");
+          console.error("Erro ao subir capa:", err);
+          return;
+        }
       }
 
+      // Salvar os dados no banco
       const result = await updateGalleryDescription({
         restaurantId,
         description: data.description ?? "",

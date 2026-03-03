@@ -11,11 +11,11 @@ export async function uploadToCloudinary(file: File) {
     cloudinaryFormData.append("file", base64Data);
     cloudinaryFormData.append(
       "upload_preset",
-      process.env.CLOUDINARY_UPLOAD_PRESET!,
+      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!,
     );
 
     const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
+      `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
       {
         method: "POST",
         body: cloudinaryFormData,

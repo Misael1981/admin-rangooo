@@ -26,6 +26,7 @@ import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
+import imageCompression from "browser-image-compression";
 
 type DialogAddProductProps = {
   product: MenuProductWithCategoryDTO | null;
@@ -83,14 +84,64 @@ const DialogAddProduct = ({
     }
   }, [product, form]);
 
+  const uploadToCloudinaryClient = async (file: File) => {
+    const options = {
+      maxSizeMB: 0.7,
+      maxWidthOrHeight: 1080,
+      useWebWorker: true,
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+
+      const formData = new FormData();
+      formData.append("file", compressedFile);
+      formData.append(
+        "upload_preset",
+        process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!,
+      );
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
+
+      const data = await response.json();
+      return {
+        url: data.secure_url,
+        publicId: data.public_id,
+      };
+    } catch (error) {
+      console.error("Erro na compressão ou upload:", error);
+      throw error;
+    }
+  };
+
   const onSubmit = async (data: z.infer<typeof productSchema>) => {
     try {
+      let finalImageUrl = data.imageUrl as string;
+
+      // Fazer upload da imagem se for um arquivo
+      if (data.imageUrl instanceof File) {
+        try {
+          const uploadResult = await uploadToCloudinaryClient(data.imageUrl);
+          finalImageUrl = uploadResult.url;
+        } catch (err) {
+          toast.error("Falha ao subir a imagem para a nuvem.");
+          console.error("Erro ao subir imagem:", err);
+          return;
+        }
+      }
+
       const payload = {
         id: product?.id, // Se o product veio via props, o ID vai aqui
         name: data.name,
         price: parseCurrencyBRL(data.price),
         description: data.description,
-        imageUrl: data.imageUrl,
+        imageUrl: finalImageUrl,
         ingredients: data.ingredients
           ? data.ingredients
               .split(",")

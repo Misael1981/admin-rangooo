@@ -26,7 +26,7 @@ export default async function HorariosFuncionamentoPage({ params }: PageProps) {
   }));
 
   return (
-    <div className="space-y-6 px-8 pb-8">
+    <div className="space-y-6 px-4 sm:px-8 pb-8">
       <BreadcrumbComponent
         currentPage="Horários de Funcionamento"
         slug={slug}
