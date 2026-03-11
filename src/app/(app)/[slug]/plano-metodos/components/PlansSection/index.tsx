@@ -266,7 +266,7 @@ const PlansSection = ({
         <Button
           type="submit"
           form="form-rhf-plans"
-          disabled={form.formState.isSubmitting} // TRAVA O BOTÃO AQUI!
+          disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? "Salvando..." : "Salvar Alterações"}
         </Button>

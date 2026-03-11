@@ -5,7 +5,7 @@ import {
   ClipboardPenLine,
   Clock3,
   Home,
-  Search,
+  Motorbike,
   Settings,
   ShoppingBasket,
   SlidersHorizontal,
@@ -92,9 +92,9 @@ export function AppSidebar() {
       icon: ClipboardPenLine,
     },
     {
-      title: "Search",
-      url: "#",
-      icon: Search,
+      title: "Pedidos Entregadores",
+      url: "/rangooo/pedidos-entregadores",
+      icon: Motorbike,
     },
     {
       title: "Settings",

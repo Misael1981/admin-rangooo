@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import StatusBadge from "../StatusBadge";
 import {
   Calendar1Icon,
   Mail,
@@ -25,6 +24,14 @@ import { useTransition } from "react";
 import { approveLead } from "@/app/_actions/approve-lead";
 import { rejectLead } from "@/app/_actions/reject-lead";
 import { toast } from "sonner";
+import { CheckCircle, Clock, XCircle } from "lucide-react";
+import StatusBadge from "@/components/StatusBadge";
+
+export const orderStatusConfig = {
+  PENDING: { variant: "secondary", icon: Clock, label: "Pendente" },
+  APPROVED: { variant: "default", icon: CheckCircle, label: "Aprovado" },
+  REJECTED: { variant: "destructive", icon: XCircle, label: "Rejeitado" },
+} as const;
 
 type LeadProps = {
   lead: LeadApplication;
@@ -91,7 +98,7 @@ const LeadCard = ({ lead }: LeadProps) => {
               {lead.name}
             </CardDescription>
           </div>
-          <StatusBadge status={lead.status} />
+          <StatusBadge status={lead.status} config={orderStatusConfig} />
         </div>
       </CardHeader>
 
