@@ -1,0 +1,26 @@
+"use server";
+
+import { db } from "@/lib/prisma";
+import { OrderStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+
+export async function updateOrderStatus(
+  orderId: string,
+  status: OrderStatus,
+  slug: string,
+) {
+  try {
+    await db.order.update({
+      where: { id: orderId },
+      data: { status },
+      select: { id: true },
+    });
+
+    revalidatePath(`/${slug}/pedidos`);
+
+    return { success: true };
+  } catch (error) {
+    console.error("ERRO_ATUALIZAR_STATUS:", error);
+    return { success: false, error: "Erro ao atualizar status." };
+  }
+}

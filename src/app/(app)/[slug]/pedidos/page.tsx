@@ -3,10 +3,10 @@ import HeaderOrdersPage from "./components/HeaderOrdersPage";
 import { notFound } from "next/navigation";
 import { AreaType, ConsumptionMethod } from "@prisma/client";
 import FilterConsumptionMethods from "./components/FilterConsumptionMethods";
-import CardOrder from "./components/CardOrder";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 import { OrderAddress } from "@/dtos/order.dto";
 import NotificationMobile from "@/components/NotificationMobile";
+import CardOrder from "./components/CardOrderClient";
 
 function parseAddress(address: unknown): OrderAddress | undefined {
   if (!address || typeof address !== "object" || Array.isArray(address)) {
@@ -87,7 +87,7 @@ export default async function OrdersPage({
 
       <section className="flex flex-col items-center justify-center gap-4">
         {normalizedOrders.map((order) => (
-          <CardOrder key={order.id} order={order} />
+          <CardOrder key={order.id} order={order} slug={slug} />
         ))}
       </section>
     </div>

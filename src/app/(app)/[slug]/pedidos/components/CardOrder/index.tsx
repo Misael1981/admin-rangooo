@@ -15,9 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { OrderStatus } from "@prisma/client";
 import {
   CardOrderProps,
@@ -28,20 +27,15 @@ import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import OrderReceipt from "../OrderReceipt";
 import { useReactToPrint } from "react-to-print";
+import { updateOrderStatus } from "@/app/_actions/update-order-status";
 
-const CardOrder = ({ order }: CardOrderProps) => {
-  const router = useRouter();
-  const [isMounted, setIsMounted] = useState(false);
+const CardOrder = ({ order, slug }: CardOrderProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
     contentRef,
     documentTitle: `Pedido_${order.orderNumber}`,
   });
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const methodConfig = METHOD_CONFIGS[order.method!];
   const MethodIcon = methodConfig.icon;
@@ -50,21 +44,22 @@ const CardOrder = ({ order }: CardOrderProps) => {
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
-      const res = await fetch(`/api/orders`, {
-        method: "PATCH",
-        body: JSON.stringify({ id: order.id, status: newStatus }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const result = await updateOrderStatus(
+        order.id,
+        newStatus as OrderStatus,
+        slug!,
+      );
 
-      if (!res.ok) throw new Error();
+      if (!result.success) {
+        toast.error("Erro ao atualizar status");
+        return;
+      }
+
       toast.success("Status atualizado!");
-      router.refresh();
     } catch {
-      toast.error("Erro ao atualizar status");
+      toast.error("Erro inesperado.");
     }
   };
-
-  if (!isMounted) return null;
 
   return (
     <>

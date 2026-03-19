@@ -60,6 +60,7 @@ export const STATUS_CONFIGS: Record<OrderStatus, StatusConfig> = {
 
 export interface CardOrderProps {
   order: OrderDTO;
+  slug?: string;
 }
 
 export const RestaurantCategory = [
