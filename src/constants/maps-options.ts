@@ -5,6 +5,7 @@ import {
   ChefHat,
   Clock,
   LucideIcon,
+  Motorbike,
   Package,
   Truck,
   UtensilsCrossed,
@@ -23,7 +24,7 @@ export const STATUS_CONFIGS: Record<OrderStatus, StatusConfig> = {
     variant: "secondary",
     icon: Clock,
     label: "Pendente",
-    color: "text-amber-600 bg-amber-50",
+    color: "text-pink-800 bg-pink-200",
   },
   CONFIRMED: {
     variant: "default",
@@ -35,7 +36,13 @@ export const STATUS_CONFIGS: Record<OrderStatus, StatusConfig> = {
     variant: "default",
     icon: ChefHat,
     label: "Em Preparo",
-    color: "text-purple-600 bg-purple-50",
+    color: "text-orange-600 bg-orange-50",
+  },
+  OUT_FOR_DELIVERY: {
+    variant: "default",
+    icon: Motorbike,
+    label: "Saiu para a entrega",
+    color: "text-yellow-600 bg-yellow-50",
   },
   DELIVERED: {
     variant: "default",

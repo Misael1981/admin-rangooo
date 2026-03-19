@@ -152,26 +152,62 @@ model DeliveryPerson {
   createdAt         DateTime             @default(now())
   updatedAt         DateTime             @updatedAt
 
+  pushSubscriptions PushSubscription[]
   user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   deliveries        OrderDelivery[]
+  deliverySessions  DeliverySession[]
+  orderRejections   OrderRejection[]
 
   @@map("delivery_persons")
 }
 
-model OrderDelivery {
-  id               String             @id @default(uuid())
-  orderId          String             @unique
+model PushSubscription {
+  id               String         @id @default(uuid())
   deliveryPersonId String
-  assignedAt       DateTime           @default(now())
-  pickedUpAt       DateTime?
-  deliveredAt      DateTime?
-  status           DeliveryStatus     @default(ASSIGNED)
+  endpoint         String         @unique 
+  auth             String         
+  p256dh           String         
+  createdAt        DateTime       @default(now())
 
-  order            Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  deliveryPerson   DeliveryPerson     @relation(fields: [deliveryPersonId], references: [id])
-
-  @@map("order_deliveries")
+  deliveryPerson   DeliveryPerson @relation(fields: [deliveryPersonId], references: [id], onDelete: Cascade)
 }
+model OrderRejection {
+  id               String   @id @default(cuid())
+  orderId          String
+  deliveryPersonId String
+  reason           String?
+  createdAt        DateTime @default(now())
+
+  deliveryPerson   DeliveryPerson @relation(fields: [deliveryPersonId], references: [id])
+  
+  @@index([deliveryPersonId])
+  @@map("order_rejections")
+}
+
+model DeliverySession {
+  id                 String    @id @default(cuid())
+  deliveryPersonId   String
+  date               DateTime  @default(now()) 
+  startTime          DateTime  @default(now())
+  endTime            DateTime?
+  lastRejectionAt    DateTime?
+  rejectionsCount    Int       @default(0) 
+  
+  ordersCompleted    Int       @default(0)
+  totalEarnings      Decimal   @default(0) @db.Decimal(10, 2) 
+  sessionRating      Float?    
+  sessionRatingCount Int       @default(0)
+  
+  totalFeeToPay      Decimal   @default(0) @db.Decimal(10, 2) 
+  isPaid             Boolean   @default(false)                
+
+  deliveryPerson   DeliveryPerson @relation(fields: [deliveryPersonId], references: [id])
+
+  
+  @@unique([deliveryPersonId, date]) 
+  @@map("delivery_sessions")
+}
+
 
 model Restaurant {
   id                  String                        @id @default(uuid())
@@ -376,12 +412,28 @@ model Order {
   orderNumber       Int?
   printId           String?
   paymentMethod     String?
+  deliveryPersonId  String?
   delivery          OrderDelivery?
   consumptionMethod ConsumptionMethod @default(DELIVERY)
   status            OrderStatus       @default(PENDING)
   restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   items             OrderItem[]
+}
+
+model OrderDelivery {
+  id               String             @id @default(uuid())
+  orderId          String             @unique
+  deliveryPersonId String
+  assignedAt       DateTime           @default(now())
+  pickedUpAt       DateTime?
+  deliveredAt      DateTime?
+  status           DeliveryStatus     @default(ASSIGNED)
+
+  order            Order              @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  deliveryPerson   DeliveryPerson     @relation(fields: [deliveryPersonId], references: [id])
+
+  @@map("order_deliveries")
 }
 
 model OrderItem {
@@ -430,6 +482,7 @@ enum OrderStatus {
   PENDING
   CONFIRMED
   PREPARING
+  OUT_FOR_DELIVERY
   DELIVERED
   CANCELED
 }
