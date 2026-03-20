@@ -17,6 +17,7 @@ export const getRestaurantMenuBySlug = async (slug: string) => {
           imageUrl: true,
           description: true,
           ingredients: true,
+          isVisible: true,
         },
         orderBy: { name: "asc" },
       },

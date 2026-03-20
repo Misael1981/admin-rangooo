@@ -18,6 +18,8 @@ import {
   ChevronUp,
   CirclePlus,
   Edit,
+  Eye,
+  EyeOff,
   Search,
   Trash2,
 } from "lucide-react";
@@ -25,6 +27,7 @@ import { useState } from "react";
 import DialogAddProduct from "../DialogAddProduct";
 import { deleteProduct } from "@/app/_actions/menu/upsert-product";
 import { toast } from "sonner";
+import { toggleProductVisibility } from "@/app/_actions/toggle-product-visibility";
 
 type ProductsListSessionProps = {
   selectedProductsCategory: MenuCategoryWithProductsDTO | null;
@@ -40,14 +43,38 @@ const ProductsListSession = ({
   const [search, setSearch] = useState("");
   const [selectedProduct, setSelectedProduct] =
     useState<MenuProductWithCategoryDTO | null>(null);
+  const [visibilityMap, setVisibilityMap] = useState<Record<string, boolean>>(
+    () =>
+      Object.fromEntries(
+        selectedProductsCategory?.products.map((p) => [p.id, p.isVisible]) ??
+          [],
+      ),
+  );
 
   if (!selectedProductsCategory) {
     return null;
   }
 
+  console.log("Produtos selecionados: ", selectedProductsCategory.products);
+
   const filteredProducts = selectedProductsCategory.products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const handleToggleVisibility = async (id: string) => {
+    const newValue = !visibilityMap[id];
+
+    setVisibilityMap((prev) => ({ ...prev, [id]: newValue }));
+
+    const result = await toggleProductVisibility(id, newValue, slug);
+
+    if (result.success) {
+      toast.success("Produto atualizado com sucesso!");
+    } else {
+      setVisibilityMap((prev) => ({ ...prev, [id]: !newValue }));
+      toast.error("Erro ao atualizar visibilidade.");
+    }
+  };
 
   const handleEditProduct = (product: MenuProductWithCategoryDTO) => {
     setSelectedProduct(product);
@@ -131,8 +158,20 @@ const ProductsListSession = ({
                     <Button
                       variant="ghost"
                       size="icon"
+                      className="h-8 w-8 transition-transform hover:scale-110"
+                      onClick={() => handleToggleVisibility(p.id)}
+                    >
+                      {visibilityMap[p.id] ? (
+                        <Eye size={14} />
+                      ) : (
+                        <EyeOff size={14} />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => handleEditProduct(p)}
-                      className="h-8 w-8"
+                      className="h-8 w-8 transition-transform hover:scale-110"
                     >
                       <Edit size={14} />
                     </Button>

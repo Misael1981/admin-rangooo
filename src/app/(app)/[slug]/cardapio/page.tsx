@@ -30,6 +30,7 @@ export default async function CardapioPage({ params }: PageProps) {
       price: Number(p.price),
       imageUrl: p.imageUrl,
       ingredients: p.ingredients,
+      isVisible: p.isVisible,
     })),
 
     additionalIngredients: cat.additionalIngredients.map((i) => ({

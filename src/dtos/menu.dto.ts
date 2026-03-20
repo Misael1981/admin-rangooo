@@ -14,6 +14,7 @@ export interface MenuProductDTO {
   price: number;
   imageUrl: string | null;
   ingredients: string[];
+  isVisible: boolean;
 }
 
 export interface AdditionalIngredientDTO {
@@ -32,6 +33,7 @@ export interface MenuCategoryWithProductsDTO {
     description: string | null;
     imageUrl: string | null;
     ingredients: string[];
+    isVisible: boolean;
   }[];
 }
 
@@ -42,4 +44,5 @@ export interface MenuProductWithCategoryDTO {
   description: string | null;
   imageUrl: string | null;
   ingredients: string[];
+  isVisible: boolean;
 }
