@@ -73,6 +73,11 @@ export function AppSidebar() {
       url: `/${slug}/usuarios`,
       icon: Users,
     },
+    {
+      title: "Entregadores Rangooo Disponíveis",
+      url: `/${slug}/entregadores-disponiveis`,
+      icon: Motorbike,
+    },
   ];
 
   const linksRangooo = [
