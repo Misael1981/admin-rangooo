@@ -1,6 +1,7 @@
 import { getAllEstablishments } from "@/data/get-all-establishments";
 import { LayoutDashboard } from "lucide-react";
 import SearchEstablishments from "./components/SearchEstablishments";
+import ButtonLogout from "./components/ButtonLogout";
 
 export default async function RangoooPage() {
   const establishments = await getAllEstablishments();
@@ -18,7 +19,7 @@ export default async function RangoooPage() {
         </div>
       </header>
       <SearchEstablishments establishments={establishments} />
+      <ButtonLogout />
     </div>
   );
 }
-//get-delivery-prices.ts
