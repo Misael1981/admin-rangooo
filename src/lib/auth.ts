@@ -38,12 +38,7 @@ export const authOptions: NextAuthOptions = {
       const userExists = await db.user.findUnique({
         where: { email: user.email! },
       });
-
-      if (userExists) {
-        return true;
-      } else {
-        return false;
-      }
+      return !!userExists;
     },
     async jwt({ token, user }) {
       if (user) {
@@ -64,11 +59,21 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
     },
+  },
+  events: {
+    async signOut() {
+      // limpa ao fazer logout
+    },
+  },
+  pages: {
+    signIn: "/",
+    error: "/auth/error",
   },
   session: {
     strategy: "jwt",
