@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 import { getAllEstablishments } from "@/data/get-all-establishments";
 import { LayoutDashboard } from "lucide-react";
 import SearchEstablishments from "./components/SearchEstablishments";
