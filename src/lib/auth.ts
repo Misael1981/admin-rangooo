@@ -31,51 +31,62 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
+    // src/lib/auth.ts
+
+    async signIn({ user, account }) {
+      // 1. Se for Google, a gente confia no e-mail
+      if (account?.provider === "google") {
+        return true;
+      }
+
+      // 2. Se você quiser restringir apenas a quem já está no banco:
       const userExists = await db.user.findUnique({
         where: { email: user.email! },
       });
-      return !!userExists;
+
+      if (!userExists) {
+        return "/auth/error?error=UserNotFound";
+      }
+
+      return true;
     },
     async jwt({ token, user }) {
+      // No login inicial, o 'user' está disponível
       if (user) {
-        token.role = user.role;
-        const restaurant = await db.restaurant.findFirst({
-          where: { ownerId: user.id },
-          select: { slug: true },
+        const dbUser = await db.user.findUnique({
+          where: { email: token.email! },
         });
-        console.log("Busca de Restaurante no Login:", restaurant);
-        token.slug = restaurant?.slug;
+
+        if (dbUser) {
+          token.role = dbUser.role;
+          const restaurant = await db.restaurant.findFirst({
+            where: { ownerId: dbUser.id },
+            select: { slug: true },
+          });
+          token.slug = restaurant?.slug;
+        }
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
+      if (session.user && token) {
         session.user.role = token.role as string;
         session.user.slug = token.slug as string;
       }
       return session;
     },
-
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
-    },
-  },
-  events: {
-    async signOut() {
-      // limpa ao fazer logout
-    },
+    // Removi o redirect manual pra deixar o NextAuth lidar com o baseUrl padrão
   },
   pages: {
     signIn: "/",
-    error: "/auth/error",
+    error: "/auth/error", // Garanta que essa página exista para você ver o erro real
   },
   session: {
     strategy: "jwt",
   },
+  secret: process.env.NEXTAUTH_SECRET, // CERTIFIQUE-SE QUE ISSO ESTÁ NA VERCEL
 };
