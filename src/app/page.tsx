@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 import CardForm from "@/components/CardForm";
 import CardLogo from "@/components/CardLogo";
 import { authOptions } from "@/lib/auth";
@@ -6,18 +8,17 @@ import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
-  const user = session?.user;
 
   if (session) {
-    // 1. Se for ADMIN, vai para a área mestre
+    const user = session.user;
     if (user?.role === "ADMIN") {
-      return redirect("/rangooo");
+      redirect("/rangooo");
     }
 
-    // 2. Se for DONO, vai para o slug dele
     if (user?.role === "RESTAURANT_OWNER" && user.slug) {
-      return redirect(`/${user.slug}`);
+      redirect(`/${user.slug}`);
     }
+    redirect("/sem-acesso");
   }
 
   return (

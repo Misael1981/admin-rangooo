@@ -35,13 +35,17 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ token, req }) => {
+        const isPublic =
+          req.nextUrl.pathname === "/login" || req.nextUrl.pathname === "/";
+        return isPublic ? true : !!token;
+      },
     },
   },
 );
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|login|images|public).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|login|images|public|$).*)",
   ],
 };
