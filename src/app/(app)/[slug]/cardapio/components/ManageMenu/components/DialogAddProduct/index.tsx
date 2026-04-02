@@ -79,7 +79,19 @@ const DialogAddProduct = ({
   useEffect(() => {
     if (product) {
       form.reset({
+        name: product.name,
+        price: formatCurrencyBRL(String(product.price * 100)),
         ingredients: product.ingredients.join(", "),
+        description: product.description || "",
+        imageUrl: product.imageUrl,
+      });
+    } else {
+      form.reset({
+        name: "",
+        price: "",
+        ingredients: "",
+        description: "",
+        imageUrl: null,
       });
     }
   }, [product, form]);
@@ -169,8 +181,8 @@ const DialogAddProduct = ({
 
   return (
     <Dialog open={dialogAddProductOpen} onOpenChange={setDialogAddProductOpen}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <DialogContent className="sm:max-w-md w-full">
+      <DialogContent className="sm:max-w-md w-full">
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <DialogHeader>
             <DialogTitle>
               Produto da
@@ -196,7 +208,15 @@ const DialogAddProduct = ({
               <div className="flex gap-2">
                 <Field className="w-2/3">
                   <Label htmlFor="name-1">Nome</Label>
-                  <Input id="name-1" name="name" defaultValue={product?.name} />
+                  <Input
+                    id="name-1"
+                    {...form.register("name")} // 👈 Use o register aqui
+                  />
+                  {form.formState.errors.name && (
+                    <span className="text-xs text-red-500">
+                      {form.formState.errors.name.message}
+                    </span>
+                  )}
                 </Field>
                 <Field className="w-1/3">
                   <Label htmlFor="price">Preço</Label>
@@ -215,16 +235,14 @@ const DialogAddProduct = ({
                 <Label htmlFor="ingredients-1">Ingredientes</Label>
                 <Input
                   id="ingredients-1"
-                  name="ingredients"
-                  defaultValue={product?.ingredients}
+                  {...form.register("ingredients")} // 👈 Use o register aqui
                 />
               </Field>
               <Field>
                 <Label htmlFor="description-1">Descrição</Label>
                 <Textarea
                   id="description-1"
-                  name="description"
-                  defaultValue={product?.description || ""}
+                  {...form.register("description")} // 👈 Use o register aqui
                 />
               </Field>
             </FieldGroup>
@@ -235,8 +253,8 @@ const DialogAddProduct = ({
             </DialogClose>
             <Button type="submit">Salvar</Button>
           </DialogFooter>
-        </DialogContent>
-      </form>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

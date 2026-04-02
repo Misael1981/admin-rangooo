@@ -19,7 +19,7 @@ const NotificationMobile = () => {
       <Button
         variant="ghost"
         size="icon"
-        className="text-primary h-12 w-12" // Aumentei o botão também para caber o sino
+        className="text-primary h-12 w-12"
         onClick={handleRequestPermission}
       >
         <Bell size={32} strokeWidth={2.5} />
