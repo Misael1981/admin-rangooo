@@ -58,8 +58,6 @@ export default async function OrdersPage({
 
   const { restaurant, orders } = data;
 
-  console.log("Orders data:", orders);
-
   const normalizedOrders = orders.map((order) => ({
     id: order.id,
     customerName: order.customerName,

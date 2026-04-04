@@ -51,12 +51,11 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
           id: true,
           quantity: true,
           priceAtOrder: true,
-          customName: true, // Garanta que o nome customizado venha aqui
-          // ADICIONE ESTES:
+          customName: true,
           extras: true,
           removedIngredients: true,
           additionalIngredients: true,
-          // CAMPOS DO SABOR 2 (que você já colocou e estão certos):
+          // CAMPOS DO SABOR 2
           isDouble: true,
           flavor2Id: true,
           flavor2Name: true,
@@ -79,7 +78,6 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
     deliveryFee: Number(restaurant.deliveryFee),
   };
 
-  // No final do get-orders-data.ts
   const viewOrders = orders.map((o) => ({
     id: o.id,
     customerName: o.user?.name ?? "Cliente Final",
