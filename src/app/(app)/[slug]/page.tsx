@@ -6,9 +6,9 @@ import { notFound, redirect } from "next/navigation";
 import StatusOpenSwitch from "@/components/StatusOpenSwitch";
 import CardForHeader from "./components/CardForHeader";
 import DailySalesSummary from "./components/DailySalesSummary";
-import { endOfDay, startOfDay } from "date-fns";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 import NotificationMobile from "@/components/NotificationMobile";
+import { Card } from "@/components/ui/card";
 interface RestaurantPageProps {
   params: Promise<{ slug: string }>;
 }
@@ -21,7 +21,26 @@ export default async function Establishment({ params }: RestaurantPageProps) {
     redirect("/");
   }
 
-  const today = new Date();
+  function getBrasiliaDate() {
+    const now = new Date();
+    const spDateString = now.toLocaleString("en-US", {
+      timeZone: "America/Sao_Paulo",
+    });
+    return new Date(spDateString);
+  }
+
+  const now = getBrasiliaDate();
+  const cutoffHour = 6;
+
+  const startOfShift = new Date(now);
+  if (now.getHours() < cutoffHour) {
+    startOfShift.setDate(startOfShift.getDate() - 1);
+  }
+
+  startOfShift.setHours(cutoffHour, 0, 0, 0);
+
+  const endOfShift = new Date(startOfShift);
+  endOfShift.setDate(endOfShift.getDate() + 1);
 
   const restaurant = await db.restaurant.findUnique({
     where: { slug },
@@ -34,8 +53,8 @@ export default async function Establishment({ params }: RestaurantPageProps) {
         where: {
           status: { not: "CANCELED" },
           createdAt: {
-            gte: startOfDay(today),
-            lte: endOfDay(today),
+            gte: startOfShift,
+            lt: endOfShift,
           },
         },
         select: {
@@ -72,8 +91,30 @@ export default async function Establishment({ params }: RestaurantPageProps) {
         </div>
       </header>
 
-      {/* Seção Resumo do dia */}
-      <DailySalesSummary todayOrders={restaurant.orders} />
+      {!restaurant.isOpen ? (
+        <Card className="w-full flex flex-col items-center justify-center gap-4 border-yellow-300 bg-yellow-50 p-8 text-center shadow-sm">
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-3xl">⚠️</span>
+
+            <h2 className="text-xl font-semibold text-yellow-800">
+              Estabelecimento fechado
+            </h2>
+
+            <p className="text-sm text-yellow-700 max-w-md">
+              Seu estabelecimento está fechado no momento. Abra para começar a
+              receber pedidos.
+            </p>
+          </div>
+
+          <div className="mt-4">
+            <span className="text-xs text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full">
+              Nenhum pedido será recebido enquanto estiver fechado
+            </span>
+          </div>
+        </Card>
+      ) : (
+        <DailySalesSummary todayOrders={restaurant.orders} />
+      )}
     </div>
   );
 }
