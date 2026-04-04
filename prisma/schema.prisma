@@ -448,8 +448,17 @@ model OrderItem {
   additionalIngredients Json?
   customName            String?
   extras                String?
-  order                 Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product               Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  removedIngredients    String?
+
+  // 2 sabores
+  isDouble                     Boolean @default(false)
+  flavor2Id                    String?
+  flavor2Name                  String?
+  flavor2Removed               String?
+  flavor2additionalIngredients Json?
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 enum InviteStatus {

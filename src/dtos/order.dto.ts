@@ -17,6 +17,15 @@ export type OrderItemDTO = {
   price: number;
   quantity: number;
   category: string;
+
+  extras?: string | null;
+  removedIngredients?: string | null;
+  additionalIngredients?: string[];
+
+  isDouble?: boolean;
+  flavor2Name?: string;
+  flavor2Removed?: string[];
+  flavor2additionalIngredients?: string[];
 };
 
 export type OrderItemPrintDTO = {

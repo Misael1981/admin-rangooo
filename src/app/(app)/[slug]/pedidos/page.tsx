@@ -58,6 +58,8 @@ export default async function OrdersPage({
 
   const { restaurant, orders } = data;
 
+  console.log("Orders data:", orders);
+
   const normalizedOrders = orders.map((order) => ({
     id: order.id,
     customerName: order.customerName,
@@ -69,7 +71,27 @@ export default async function OrdersPage({
     paymentMethod: order.paymentMethod,
     createdAt: order.createdAt,
     address: parseAddress(order.address),
-    items: order.items,
+    items: order.items.map((i) => ({
+      id: i.id,
+      quantity: i.quantity,
+      price: Number(i.priceAtOrder),
+      name: i.name,
+      extras: i.extras,
+      removedIngredients: i.removedIngredients,
+      additionalIngredients: i.additionalIngredients
+        ? (i.additionalIngredients as string[])
+        : undefined,
+      category: i.category ?? "Geral",
+      // SABOR 2:
+      isDouble: i.isDouble,
+      flavor2Name: i.flavor2Name ?? undefined,
+      flavor2Removed: i.flavor2Removed
+        ? JSON.parse(i.flavor2Removed)
+        : undefined,
+      flavor2additionalIngredients: i.flavor2additionalIngredients
+        ? (i.flavor2additionalIngredients as string[])
+        : undefined,
+    })),
   }));
 
   return (

@@ -51,12 +51,21 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
           id: true,
           quantity: true,
           priceAtOrder: true,
+          customName: true, // Garanta que o nome customizado venha aqui
+          // ADICIONE ESTES:
+          extras: true,
+          removedIngredients: true,
+          additionalIngredients: true,
+          // CAMPOS DO SABOR 2 (que você já colocou e estão certos):
+          isDouble: true,
+          flavor2Id: true,
+          flavor2Name: true,
+          flavor2Removed: true,
+          flavor2additionalIngredients: true,
           product: {
             select: {
               name: true,
-              menuCategory: {
-                select: { name: true },
-              },
+              menuCategory: { select: { name: true } },
             },
           },
         },
@@ -70,6 +79,7 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
     deliveryFee: Number(restaurant.deliveryFee),
   };
 
+  // No final do get-orders-data.ts
   const viewOrders = orders.map((o) => ({
     id: o.id,
     customerName: o.user?.name ?? "Cliente Final",
@@ -83,12 +93,22 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
     address: o.deliveryAddress,
     items: o.items.map((i) => ({
       id: i.id,
-      name: i.product.name,
       quantity: i.quantity,
-      price: Number(i.priceAtOrder),
-      category: i.product.menuCategory.name,
+      priceAtOrder: Number(i.priceAtOrder),
+      name: i.customName || i.product.name,
+      extras: i.extras,
+      removedIngredients: i.removedIngredients,
+      additionalIngredients: i.additionalIngredients,
+      category: i.product.menuCategory?.name ?? "Geral",
+      // SABOR 2
+      isDouble: i.isDouble,
+      flavor2Name: i.flavor2Name,
+      flavor2Removed: i.flavor2Removed,
+      flavor2additionalIngredients: i.flavor2additionalIngredients,
     })),
   }));
+
+  return { restaurant: safeRestaurant, orders: viewOrders };
 
   return {
     restaurant: safeRestaurant,

@@ -61,6 +61,8 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
     }
   };
 
+  console.log("Item: ", order.items);
+
   return (
     <>
       <Card className="w-full gap-0 max-w-3xl border-2 transition-all hover:border-primary/20 p-0">
@@ -142,6 +144,7 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
             <div className="space-y-1">
               <p className="text-sm font-medium">
                 {order.customerName || "Cliente"}
+                {order.customerPhone && ` - ${order.customerPhone}`}
               </p>
               {order.method === "DELIVERY" && order.address && (
                 <p className="text-xs text-muted-foreground">
