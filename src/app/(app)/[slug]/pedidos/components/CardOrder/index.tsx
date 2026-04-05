@@ -61,8 +61,6 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
     }
   };
 
-  console.log("Item: ", order.items);
-
   return (
     <>
       <Card className="w-full gap-0 max-w-3xl border-2 transition-all hover:border-primary/20 p-0">

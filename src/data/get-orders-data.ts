@@ -31,6 +31,9 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
     where: {
       restaurantId: restaurant.id,
       consumptionMethod: method,
+      status: {
+        not: "CANCELED",
+      },
       createdAt: {
         gte: startOfShift,
         lt: endOfShift,
