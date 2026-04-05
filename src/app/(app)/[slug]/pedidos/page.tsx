@@ -6,7 +6,7 @@ import FilterConsumptionMethods from "./components/FilterConsumptionMethods";
 import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 import { OrderAddress } from "@/dtos/order.dto";
 import NotificationMobile from "@/components/NotificationMobile";
-import CardOrder from "./components/CardOrderClient";
+import OrdersListWrapper from "./components/OrdersListWrapper";
 
 function parseAddress(address: unknown): OrderAddress | undefined {
   if (!address || typeof address !== "object" || Array.isArray(address)) {
@@ -105,25 +105,7 @@ export default async function OrdersPage({
         consumptionMethods={restaurant.consumptionMethods}
       />
 
-      <section className="flex flex-col items-center justify-center gap-4">
-        {normalizedOrders.length === 0 ? (
-          <div className="w-full max-w-md flex flex-col items-center justify-center gap-3 border border-gray-200 bg-gray-50 p-6 rounded-xl text-center shadow-sm">
-            <span className="text-3xl">📭</span>
-
-            <h3 className="text-lg font-semibold text-gray-800">
-              Nenhum pedido por enquanto
-            </h3>
-
-            <p className="text-sm text-gray-600">
-              Assim que novos pedidos chegarem, eles aparecerão aqui.
-            </p>
-          </div>
-        ) : (
-          normalizedOrders.map((order) => (
-            <CardOrder key={order.id} order={order} slug={slug} />
-          ))
-        )}
-      </section>
+      <OrdersListWrapper normalizedOrders={normalizedOrders} slug={slug} />
     </div>
   );
 }
