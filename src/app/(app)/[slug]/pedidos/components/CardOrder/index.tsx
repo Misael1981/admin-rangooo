@@ -35,6 +35,18 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
   const handlePrint = useReactToPrint({
     contentRef,
     documentTitle: `Pedido_${order.orderNumber}`,
+    pageStyle: `
+    @page {
+      size: 58mm auto;
+      margin: 0;
+    }
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+      }
+    }
+  `,
   });
 
   const methodConfig = METHOD_CONFIGS[order.method!];

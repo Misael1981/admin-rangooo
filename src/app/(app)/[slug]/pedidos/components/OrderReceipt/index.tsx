@@ -132,7 +132,7 @@ const OrderReceipt = ({ order }: OrderReceiptProps) => {
 
       {/* Rodapé */}
       <div className="text-center mt-2  border-t pt-1 text-[8px] font-bold tracking-widest">
-        *** OBRIGADO! ***
+        *** Sistema Rangooo! ***
       </div>
     </div>
   );
