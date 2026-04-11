@@ -34,63 +34,152 @@ const OrderReceipt = ({ order }: OrderReceiptProps) => {
   });
 
   return (
-    <div className="print-only w-[58mm] p-1 text-[9px] font-sans leading-normal text-black">
+    <div
+      style={{
+        width: "58mm",
+        padding: "4px",
+        fontSize: "9px",
+        fontFamily: "sans-serif",
+        lineHeight: "1.4",
+        color: "#000",
+      }}
+    >
       {/* Cabeçalho */}
-      <div className="text-center font-bold text-[11px] uppercase tracking-wider border-b pt-4 pb-1 my-1">
+      <div
+        style={{
+          textAlign: "center",
+          fontWeight: "bold",
+          fontSize: "11px",
+          textTransform: "uppercase",
+          letterSpacing: "1px",
+          borderBottom: "1px solid #000",
+          paddingTop: "16px",
+          paddingBottom: "4px",
+          margin: "4px 0",
+        }}
+      >
         SISTEMA RANGOOO
       </div>
 
       {/* Info do pedido */}
-      <div className="mb-1.5 space-y-0.5 pt-1">
-        <div className="flex justify-between">
+      <div style={{ marginBottom: "6px", paddingTop: "4px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span>PEDIDO:</span>
-          <span className="font-bold">#{order.orderNumber}</span>
+          <span style={{ fontWeight: "bold" }}>#{order.orderNumber}</span>
         </div>
-        <div className="flex justify-between">
+
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
           <span>DATA:</span>
           <span>{formattedDate}</span>
         </div>
-        <div className="flex">
-          <span className="mr-1">CLIENTE:</span>
-          <span className="flex-1 text-right truncate">
+
+        <div style={{ display: "flex" }}>
+          <span style={{ marginRight: "4px" }}>CLIENTE:</span>
+          <span
+            style={{
+              flex: 1,
+              textAlign: "right",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             {order.customerName}
           </span>
         </div>
       </div>
 
-      {/* Items - tabela alinhada */}
-      <div className="border-t border-b  py-0.5 my-1">
-        <div className="font-bold text-[8px] uppercase flex justify-between mb-0.5">
+      {/* Items */}
+      <div
+        style={{
+          borderTop: "1px solid #000",
+          borderBottom: "1px solid #000",
+          padding: "2px 0",
+          margin: "4px 0",
+        }}
+      >
+        <div
+          style={{
+            fontWeight: "bold",
+            fontSize: "8px",
+            textTransform: "uppercase",
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: "2px",
+          }}
+        >
           <span>Item</span>
-          <span className="flex gap-2">
-            <span className="w-8 text-right">Qtd</span>
-            <span className="w-12 text-right">Preço</span>
+          <span style={{ display: "flex", gap: "8px" }}>
+            <span style={{ width: "32px", textAlign: "right" }}>Qtd</span>
+            <span style={{ width: "48px", textAlign: "right" }}>Preço</span>
           </span>
         </div>
 
         {order.items.map((item) => (
           <div
             key={item.id}
-            className="flex items-center justify-between gap-2 border-b border-dashed border-gray-100 py-1 text-[9px] leading-tight"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "8px",
+              borderBottom: "1px dashed #ccc",
+              padding: "4px 0",
+              fontSize: "9px",
+              lineHeight: "1.2",
+            }}
           >
-            {/* Lado Esquerdo: Quantidade e Nome/Categoria */}
-            <div className="flex flex-1 items-center gap-1 overflow-hidden">
-              <div className="flex flex-col">
-                <span className="text-[7px] text-gray-500 uppercase leading-none">
+            {/* Esquerda */}
+            <div
+              style={{
+                display: "flex",
+                flex: 1,
+                alignItems: "center",
+                gap: "4px",
+                overflow: "hidden",
+              }}
+            >
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                <span
+                  style={{
+                    fontSize: "7px",
+                    color: "#666",
+                    textTransform: "uppercase",
+                    lineHeight: "1",
+                  }}
+                >
                   {item.category}
                 </span>
-                <span className="wrap-break-word font-medium">{item.name}</span>
+                <span
+                  style={{
+                    fontWeight: 500,
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {item.name}
+                </span>
               </div>
-              <span className="font-bold min-w-4">{item.quantity}x</span>
+
+              <span style={{ fontWeight: "bold", minWidth: "16px" }}>
+                {item.quantity}x
+              </span>
             </div>
 
-            {/* Lado Direito: Preço Unitário ou Total */}
-            <div className="flex flex-col items-end min-w-12">
-              <span className="whitespace-nowrap">
+            {/* Direita */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                minWidth: "48px",
+              }}
+            >
+              <span style={{ whiteSpace: "nowrap" }}>
                 {formatCurrency(item.price * item.quantity)}
               </span>
+
               {item.quantity > 1 && (
-                <span className="text-[7px] text-gray-400">
+                <span style={{ fontSize: "7px", color: "#999" }}>
                   ({formatCurrency(item.price)} un)
                 </span>
               )}
@@ -100,38 +189,73 @@ const OrderReceipt = ({ order }: OrderReceiptProps) => {
       </div>
 
       {/* Total */}
-      <div className="flex justify-between font-bold text-[11px] mt-1 border-b border-black pb-1">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontWeight: "bold",
+          fontSize: "11px",
+          marginTop: "4px",
+          borderBottom: "1px solid #000",
+          paddingBottom: "4px",
+        }}
+      >
         <span>TOTAL</span>
         <span>{formatCurrency(order.totalAmount)}</span>
       </div>
 
-      <div className="pt-2">
+      <div style={{ paddingTop: "8px" }}>
         <span>FORMA DE PAGAMENTO:</span>
-        <span className="font-bold">{order.paymentMethod}</span>
+        <span style={{ fontWeight: "bold", marginLeft: "4px" }}>
+          {order.paymentMethod}
+        </span>
       </div>
 
-      {/* Endereço de entrega */}
+      {/* Entrega */}
       {order.method === "DELIVERY" && order.address && (
-        <div className="mt-1.5 text-[8px]">
-          <span className="font-bold uppercase">Entrega:</span>
-          <span className="p-2 font-bold uppercase">
+        <div style={{ marginTop: "6px", fontSize: "8px" }}>
+          <span style={{ fontWeight: "bold", textTransform: "uppercase" }}>
+            Entrega:
+          </span>
+
+          <span
+            style={{
+              padding: "4px",
+              fontWeight: "bold",
+              textTransform: "uppercase",
+              display: "inline-block",
+            }}
+          >
             {order.address.areaType}
           </span>
-          <p className="mt-0.5">
+
+          <p style={{ marginTop: "2px" }}>
             {order.address.street}, {order.address.number},{" "}
             {order.address.neighborhood}
           </p>
+
           {order.address.complement && (
-            <p className="mt-0.5">{order.address.complement}</p>
+            <p style={{ marginTop: "2px" }}>{order.address.complement}</p>
           )}
+
           {order.address.reference && (
-            <p className="mt-0.5">{order.address.reference}</p>
+            <p style={{ marginTop: "2px" }}>{order.address.reference}</p>
           )}
         </div>
       )}
 
       {/* Rodapé */}
-      <div className="text-center mt-2  border-t pt-1 text-[8px] font-bold tracking-widest">
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "8px",
+          borderTop: "1px solid #000",
+          paddingTop: "4px",
+          fontSize: "8px",
+          fontWeight: "bold",
+          letterSpacing: "2px",
+        }}
+      >
         *** Sistema Rangooo! ***
       </div>
     </div>

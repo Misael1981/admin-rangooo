@@ -40,12 +40,23 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
       size: 58mm auto;
       margin: 0;
     }
-    @media print {
-      body {
-        margin: 0;
-        padding: 0;
-      }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      font-size: 9px;
     }
+    .receipt-container {
+      width: 58mm;
+      padding: 4px;
+    }
+    .text-center { text-align: center; }
+    .font-bold { font-weight: bold; }
+    .border-b { border-bottom: 1px solid black; }
+    .border-t { border-top: 1px solid black; }
+    .flex { display: flex; }
+    .justify-between { justify-content: space-between; }
+    .uppercase { text-transform: uppercase; }
   `,
   });
 
@@ -170,7 +181,13 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
           </div>
         </CardFooter>
       </Card>
-      <div className="hidden">
+      <div
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: 0,
+        }}
+      >
         <div ref={contentRef}>
           <OrderReceipt
             order={{
