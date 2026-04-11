@@ -25,239 +25,126 @@ type OrderReceiptProps = {
 };
 
 const OrderReceipt = ({ order }: OrderReceiptProps) => {
-  const formattedDate = new Date(order.createdAt).toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const formattedDate = new Date(order.createdAt).toLocaleString("pt-BR");
 
   return (
     <div
       style={{
-        width: "58mm",
-        padding: "4px",
-        fontSize: "9px",
-        fontFamily: "sans-serif",
-        lineHeight: "1.4",
+        width: "260px", // 🔥 diminui um pouco
+        margin: "0 auto", // 🔥 centraliza
+        padding: "0 8px", // 🔥 respiro lateral
+        fontFamily: "monospace",
+        fontSize: "12px",
         color: "#000",
       }}
     >
       {/* Cabeçalho */}
-      <div
-        style={{
-          textAlign: "center",
-          fontWeight: "bold",
-          fontSize: "11px",
-          textTransform: "uppercase",
-          letterSpacing: "1px",
-          borderBottom: "1px solid #000",
-          paddingTop: "16px",
-          paddingBottom: "4px",
-          margin: "4px 0",
-        }}
-      >
+      <div style={{ textAlign: "center", fontWeight: "bold" }}>
         SISTEMA RANGOOO
       </div>
 
-      {/* Info do pedido */}
-      <div style={{ marginBottom: "6px", paddingTop: "4px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span>PEDIDO:</span>
-          <span style={{ fontWeight: "bold" }}>#{order.orderNumber}</span>
-        </div>
+      <hr />
 
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span>DATA:</span>
-          <span>{formattedDate}</span>
-        </div>
+      {/* Info */}
+      <table style={{ width: "100%" }}>
+        <tbody>
+          <tr>
+            <td>PEDIDO:</td>
+            <td style={{ textAlign: "right" }}>#{order.orderNumber}</td>
+          </tr>
+          <tr>
+            <td>DATA:</td>
+            <td style={{ textAlign: "right" }}>{formattedDate}</td>
+          </tr>
+          <tr>
+            <td>CLIENTE:</td>
+            <td style={{ textAlign: "right" }}>{order.customerName}</td>
+          </tr>
+        </tbody>
+      </table>
 
-        <div style={{ display: "flex" }}>
-          <span style={{ marginRight: "4px" }}>CLIENTE:</span>
-          <span
-            style={{
-              flex: 1,
-              textAlign: "right",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {order.customerName}
-          </span>
-        </div>
-      </div>
+      <hr />
 
-      {/* Items */}
-      <div
-        style={{
-          borderTop: "1px solid #000",
-          borderBottom: "1px solid #000",
-          padding: "2px 0",
-          margin: "4px 0",
-        }}
-      >
-        <div
-          style={{
-            fontWeight: "bold",
-            fontSize: "8px",
-            textTransform: "uppercase",
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "2px",
-          }}
-        >
-          <span>Item</span>
-          <span style={{ display: "flex", gap: "8px" }}>
-            <span style={{ width: "32px", textAlign: "right" }}>Qtd</span>
-            <span style={{ width: "48px", textAlign: "right" }}>Preço</span>
-          </span>
-        </div>
+      {/* Itens */}
+      <table style={{ width: "100%" }}>
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left" }}>Item</th>
+            <th style={{ textAlign: "right" }}>Qtd</th>
+            <th style={{ textAlign: "right" }}>Preço</th>
+          </tr>
+        </thead>
 
-        {order.items.map((item) => (
-          <div
-            key={item.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "8px",
-              borderBottom: "1px dashed #ccc",
-              padding: "4px 0",
-              fontSize: "9px",
-              lineHeight: "1.2",
-            }}
-          >
-            {/* Esquerda */}
-            <div
-              style={{
-                display: "flex",
-                flex: 1,
-                alignItems: "center",
-                gap: "4px",
-                overflow: "hidden",
-              }}
-            >
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <span
-                  style={{
-                    fontSize: "7px",
-                    color: "#666",
-                    textTransform: "uppercase",
-                    lineHeight: "1",
-                  }}
-                >
-                  {item.category}
-                </span>
-                <span
-                  style={{
-                    fontWeight: 500,
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {item.name}
-                </span>
-              </div>
+        <tbody>
+          {order.items.map((item) => (
+            <tr key={item.id}>
+              <td>
+                <span style={{ fontSize: "10px" }}>{item.category}</span>
+                <br />
+                {item.name}
+              </td>
 
-              <span style={{ fontWeight: "bold", minWidth: "16px" }}>
-                {item.quantity}x
-              </span>
-            </div>
+              <td style={{ textAlign: "right" }}>{item.quantity}</td>
 
-            {/* Direita */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-end",
-                minWidth: "48px",
-              }}
-            >
-              <span style={{ whiteSpace: "nowrap" }}>
+              <td style={{ textAlign: "right" }}>
                 {formatCurrency(item.price * item.quantity)}
-              </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-              {item.quantity > 1 && (
-                <span style={{ fontSize: "7px", color: "#999" }}>
-                  ({formatCurrency(item.price)} un)
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+      <hr />
 
       {/* Total */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          fontWeight: "bold",
-          fontSize: "11px",
-          marginTop: "4px",
-          borderBottom: "1px solid #000",
-          paddingBottom: "4px",
-        }}
-      >
-        <span>TOTAL</span>
-        <span>{formatCurrency(order.totalAmount)}</span>
+      <table style={{ width: "100%", fontWeight: "bold" }}>
+        <tbody>
+          <tr>
+            <td>TOTAL</td>
+            <td style={{ textAlign: "right" }}>
+              {formatCurrency(order.totalAmount)}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br />
+
+      {/* Pagamento */}
+      <div>
+        PAGAMENTO: <b>{order.paymentMethod}</b>
       </div>
 
-      <div style={{ paddingTop: "8px" }}>
-        <span>FORMA DE PAGAMENTO:</span>
-        <span style={{ fontWeight: "bold", marginLeft: "4px" }}>
-          {order.paymentMethod}
-        </span>
-      </div>
+      <br />
 
-      {/* Entrega */}
+      {/* Endereço */}
       {order.method === "DELIVERY" && order.address && (
-        <div style={{ marginTop: "6px", fontSize: "8px" }}>
-          <span style={{ fontWeight: "bold", textTransform: "uppercase" }}>
-            Entrega:
-          </span>
-
-          <span
-            style={{
-              padding: "4px",
-              fontWeight: "bold",
-              textTransform: "uppercase",
-              display: "inline-block",
-            }}
-          >
-            {order.address.areaType}
-          </span>
-
-          <p style={{ marginTop: "2px" }}>
-            {order.address.street}, {order.address.number},{" "}
-            {order.address.neighborhood}
-          </p>
-
+        <div>
+          <b>ENTREGA:</b> {order.address.areaType}
+          <br />
+          {order.address.street}, {order.address.number}
+          <br />
+          {order.address.neighborhood}
+          <br />
           {order.address.complement && (
-            <p style={{ marginTop: "2px" }}>{order.address.complement}</p>
+            <>
+              {order.address.complement}
+              <br />
+            </>
           )}
-
           {order.address.reference && (
-            <p style={{ marginTop: "2px" }}>{order.address.reference}</p>
+            <>
+              {order.address.reference}
+              <br />
+            </>
           )}
         </div>
       )}
 
+      <hr />
+
       {/* Rodapé */}
-      <div
-        style={{
-          textAlign: "center",
-          marginTop: "8px",
-          borderTop: "1px solid #000",
-          paddingTop: "4px",
-          fontSize: "8px",
-          fontWeight: "bold",
-          letterSpacing: "2px",
-        }}
-      >
-        *** Sistema Rangooo! ***
-      </div>
+      <div style={{ textAlign: "center" }}>*** Sistema Rangooo ***</div>
     </div>
   );
 };

@@ -91,9 +91,18 @@
 }
 
 @media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
   @page {
     margin: 0;
-    size: 58mm auto;
+    size: 50mm auto;
   }
 
   .print-only,
@@ -123,12 +132,3 @@
     display: none;
   }
 }
-
-/* No seu global.css ou num bloco style do componente */
-/* @media print {
-  .print-receipt {
-    width: 58mm;
-    padding: 2mm;
-    margin: 0;
-  }
-} */
