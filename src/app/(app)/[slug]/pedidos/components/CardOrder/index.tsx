@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useRef } from "react";
 import { OrderStatus } from "@prisma/client";
 import {
   CardOrderProps,
@@ -25,59 +24,10 @@ import {
 } from "@/constants/maps-options";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
-import OrderReceipt from "../OrderReceipt";
 import { updateOrderStatus } from "@/app/_actions/update-order-status";
+import { printOrder } from "@/print/print-order";
 
 const CardOrder = ({ order, slug }: CardOrderProps) => {
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  const handlePrint = () => {
-    const printWindow = window.open("", "_blank", "width=400,height=600");
-
-    if (!printWindow) return;
-
-    const content = contentRef.current?.innerHTML;
-
-    printWindow.document.write(`
-    <html>
-      <head>
-        <style>
-          @page { size: 58mm auto; margin: 0; }
-
-          body { 
-            margin: 0; 
-            padding: 4px;
-            font-family: monospace; 
-            font-size: 12px; 
-            width: 58mm;
-          }
-
-          table { width: 100%; border-collapse: collapse; }
-          td, th { padding: 2px 0; }
-
-          hr { border: 1px dashed black; margin: 6px 0; }
-        </style>
-      </head>
-      <body>
-        ${content}
-      </body>
-    </html>
-  `);
-
-    printWindow.document.close();
-
-    // 🔥 ESPERA RENDERIZAR
-    printWindow.onload = () => {
-      printWindow.focus();
-      printWindow.print();
-
-      // dá um tempinho antes de fechar
-      setTimeout(() => {
-        printWindow.close();
-      }, 500);
-    };
-  };
-
   const methodConfig = METHOD_CONFIGS[order.method!];
   const MethodIcon = methodConfig.icon;
   const statusConfig = STATUS_CONFIGS[order.status];
@@ -192,7 +142,10 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
                 </p>
               )}
             </div>
-            <Button className="w-full sm:w-fit" onClick={() => handlePrint()}>
+            <Button
+              className="w-full sm:w-fit"
+              onClick={() => printOrder(order)}
+            >
               <Printer className="mr-2 h-4 w-4" />
               Imprimir Pedido
             </Button>
@@ -205,16 +158,7 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
           left: "-9999px",
           top: 0,
         }}
-      >
-        <div ref={contentRef}>
-          <OrderReceipt
-            order={{
-              ...order,
-              paymentMethod: order.paymentMethod ?? "NÃO INFORMADO",
-            }}
-          />
-        </div>
-      </div>
+      ></div>
     </>
   );
 };

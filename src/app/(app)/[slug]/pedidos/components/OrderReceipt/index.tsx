@@ -30,9 +30,9 @@ const OrderReceipt = ({ order }: OrderReceiptProps) => {
   return (
     <div
       style={{
-        width: "100%", // 🔥 diminui um pouco
-        margin: "0 auto", // 🔥 centraliza
-        padding: "0 8px", // 🔥 respiro lateral
+        width: "100%",
+        margin: "0 auto",
+        padding: "0 8px",
         fontFamily: "monospace",
         fontSize: "12px",
         color: "#000",
