@@ -43,6 +43,7 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
       <head>
         <style>
           @page { size: 58mm auto; margin: 0; }
+
           body { 
             margin: 0; 
             padding: 4px;
@@ -50,18 +51,31 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
             font-size: 12px; 
             width: 58mm;
           }
-          table { width: 100%; }
-          hr { border: 1px solid black; }
+
+          table { width: 100%; border-collapse: collapse; }
+          td, th { padding: 2px 0; }
+
+          hr { border: 1px dashed black; margin: 6px 0; }
         </style>
       </head>
-      <body>${content}</body>
+      <body>
+        ${content}
+      </body>
     </html>
   `);
 
     printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+
+    // 🔥 ESPERA RENDERIZAR
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+
+      // dá um tempinho antes de fechar
+      setTimeout(() => {
+        printWindow.close();
+      }, 500);
+    };
   };
 
   const methodConfig = METHOD_CONFIGS[order.method!];
