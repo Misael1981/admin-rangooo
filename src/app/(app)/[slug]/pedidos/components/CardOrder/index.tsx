@@ -26,39 +26,43 @@ import {
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import OrderReceipt from "../OrderReceipt";
-import { useReactToPrint } from "react-to-print";
 import { updateOrderStatus } from "@/app/_actions/update-order-status";
 
 const CardOrder = ({ order, slug }: CardOrderProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const handlePrint = useReactToPrint({
-    contentRef,
-    documentTitle: `Pedido_${order.orderNumber}`,
-    pageStyle: `
-    @page {
-      size: 58mm auto;
-      margin: 0;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-      font-size: 9px;
-    }
-    .receipt-container {
-      width: 58mm;
-      padding: 4px;
-    }
-    .text-center { text-align: center; }
-    .font-bold { font-weight: bold; }
-    .border-b { border-bottom: 1px solid black; }
-    .border-t { border-top: 1px solid black; }
-    .flex { display: flex; }
-    .justify-between { justify-content: space-between; }
-    .uppercase { text-transform: uppercase; }
-  `,
-  });
+  const handlePrint = () => {
+    const printWindow = window.open("", "_blank", "width=400,height=600");
+
+    if (!printWindow) return;
+
+    const content = contentRef.current?.innerHTML;
+
+    printWindow.document.write(`
+    <html>
+      <head>
+        <style>
+          @page { size: 58mm auto; margin: 0; }
+          body { 
+            margin: 0; 
+            padding: 4px;
+            font-family: monospace; 
+            font-size: 12px; 
+            width: 58mm;
+          }
+          table { width: 100%; }
+          hr { border: 1px solid black; }
+        </style>
+      </head>
+      <body>${content}</body>
+    </html>
+  `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
 
   const methodConfig = METHOD_CONFIGS[order.method!];
   const MethodIcon = methodConfig.icon;
