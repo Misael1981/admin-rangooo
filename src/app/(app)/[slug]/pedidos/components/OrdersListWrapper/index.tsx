@@ -2,58 +2,90 @@
 
 import { AreaType, OrderStatus } from "@prisma/client";
 import { OrderItemDTO } from "@/dtos/order.dto";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import dynamic from "next/dynamic";
+import { getPusherClient } from "@/lib/pusher";
+import { useRouter } from "next/navigation";
 const CardOrder = dynamic(() => import("../CardOrder"), {
   ssr: false,
 });
 
+type OrderType = {
+  id: string;
+  customerName: string;
+  customerPhone: string;
+  paymentMethod: string | null;
+  orderNumber: number;
+  totalAmount: number;
+  status: OrderStatus;
+  method: "DELIVERY" | "PICKUP" | "DINE_IN";
+  createdAt: string;
+  items: OrderItemDTO[];
+  address?:
+    | {
+        street: string;
+        number: string;
+        city: string;
+        neighborhood?: string;
+        complement?: string;
+        reference?: string;
+        areaType?: AreaType;
+      }
+    | undefined;
+};
+
 type OrdersListWrapperProps = {
-  normalizedOrders: {
-    id: string;
-    customerName: string;
-    customerPhone: string;
-    paymentMethod: string | null;
-    orderNumber: number;
-    totalAmount: number;
-    status: OrderStatus;
-    method: "DELIVERY" | "PICKUP" | "DINE_IN";
-    createdAt: string;
-    items: OrderItemDTO[];
-    address?:
-      | {
-          street: string;
-          number: string;
-          city: string;
-          neighborhood?: string;
-          complement?: string;
-          reference?: string;
-          areaType?: AreaType;
-        }
-      | undefined;
-  }[];
+  normalizedOrders: OrderType[];
   slug: string;
+  restaurantId: string;
 };
 
 const OrdersListWrapper = ({
   normalizedOrders,
   slug,
+  restaurantId,
 }: OrdersListWrapperProps) => {
   const [showDelivered, setShowDelivered] = useState(false);
+  const [orders, setOrders] = useState(normalizedOrders);
+  const router = useRouter();
 
-  const activeOrders = normalizedOrders.filter(
-    (order) => order.status !== "DELIVERED",
-  );
+  useEffect(() => {
+    setOrders(normalizedOrders);
+  }, [normalizedOrders]);
 
-  const deliveredOrders = normalizedOrders.filter(
+  const activeOrders = orders.filter((order) => order.status !== "DELIVERED");
+
+  const deliveredOrders = orders.filter(
     (order) => order.status === "DELIVERED",
   );
 
+  useEffect(() => {
+    const pusher = getPusherClient();
+    console.log(
+      "📡 Conectando ao Pusher, canal:",
+      `restaurant-${restaurantId}`,
+    );
+    const channel = pusher.subscribe(`restaurant-${restaurantId}`);
+
+    channel.bind("order:created", (data: { order: OrderType }) => {
+      console.log("✅ Novo pedido recebido:", data);
+      setOrders((prev) => {
+        if (prev.some((o) => o.id === data.order.id)) return prev;
+        return [data.order, ...prev];
+      });
+      router.refresh();
+    });
+
+    return () => {
+      pusher.unsubscribe(`restaurant-${restaurantId}`);
+    };
+  }, [restaurantId, router]);
+
   return (
     <section className="flex flex-col items-center justify-center gap-4">
-      {normalizedOrders.length === 0 ? (
+      {orders.length === 0 ? (
         <div className="w-full max-w-md flex flex-col items-center justify-center gap-3 border border-gray-200 bg-gray-50 p-6 rounded-xl text-center shadow-sm">
           <span className="text-3xl">📭</span>
 

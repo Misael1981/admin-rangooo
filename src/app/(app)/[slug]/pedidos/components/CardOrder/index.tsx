@@ -29,7 +29,7 @@ import { printOrder } from "@/print/print-order";
 
 const CardOrder = ({ order, slug }: CardOrderProps) => {
   const methodConfig = METHOD_CONFIGS[order.method!];
-  const MethodIcon = methodConfig.icon;
+  // const MethodIcon = methodConfig.icon;
   const statusConfig = STATUS_CONFIGS[order.status];
   const StatusIcon = statusConfig.icon;
 
@@ -67,7 +67,7 @@ const CardOrder = ({ order, slug }: CardOrderProps) => {
                   variant="outline"
                   className={`${methodConfig.color} border-current`}
                 >
-                  <MethodIcon className="mr-1 h-4 w-4" />
+                  {/* <MethodIcon className="mr-1 h-4 w-4" /> */}
                   {methodConfig.label}
                 </Badge>
                 <Badge

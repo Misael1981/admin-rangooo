@@ -118,7 +118,11 @@ export default async function OrdersPage({
 
       <SearchOrder />
 
-      <OrdersListWrapper normalizedOrders={normalizedOrders} slug={slug} />
+      <OrdersListWrapper
+        normalizedOrders={normalizedOrders}
+        restaurantId={restaurant.id}
+        slug={slug}
+      />
     </div>
   );
 }
