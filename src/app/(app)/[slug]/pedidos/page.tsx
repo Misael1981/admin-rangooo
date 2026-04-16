@@ -7,6 +7,7 @@ import BreadcrumbComponent from "@/components/BreadcrumbComponent";
 import { OrderAddress } from "@/dtos/order.dto";
 import NotificationMobile from "@/components/NotificationMobile";
 import OrdersListWrapper from "./components/OrdersListWrapper";
+import SearchOrder from "./components/SearchOrder";
 
 function parseAddress(address: unknown): OrderAddress | undefined {
   if (!address || typeof address !== "object" || Array.isArray(address)) {
@@ -35,7 +36,10 @@ interface OrdersPageProps {
   params: Promise<{
     slug: string;
   }>;
-  searchParams: Promise<{ consumptionMethod?: string }>;
+  searchParams: Promise<{
+    consumptionMethod?: string;
+    query?: string;
+  }>;
 }
 
 export default async function OrdersPage({
@@ -58,7 +62,7 @@ export default async function OrdersPage({
 
   const { restaurant, orders } = data;
 
-  const normalizedOrders = orders.map((order) => ({
+  let normalizedOrders = orders.map((order) => ({
     id: order.id,
     customerName: order.customerName,
     customerPhone: order.customerPhone,
@@ -92,6 +96,13 @@ export default async function OrdersPage({
     })),
   }));
 
+  // FILTRO DE BUSCA
+  if (sParams.query) {
+    normalizedOrders = normalizedOrders.filter((order) =>
+      order.orderNumber.toString().includes(sParams.query!),
+    );
+  }
+
   return (
     <div className="space-y-6 px-8 pb-8">
       {/* Breadcrumb */}
@@ -104,6 +115,8 @@ export default async function OrdersPage({
       <FilterConsumptionMethods
         consumptionMethods={restaurant.consumptionMethods}
       />
+
+      <SearchOrder />
 
       <OrdersListWrapper normalizedOrders={normalizedOrders} slug={slug} />
     </div>
