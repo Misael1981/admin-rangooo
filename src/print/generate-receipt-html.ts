@@ -20,8 +20,10 @@ export const generateReceiptHTML = (order: OrderDTO) => {
           font-size: 12px;
           padding: 6px;
           margin: 0;
-          width: 58mm;
+          width: 58mm; 
+          max-width: 58mm;
           color: #000;
+          box-sizing: border-box;
         }
         h1 {
           text-align: center;
