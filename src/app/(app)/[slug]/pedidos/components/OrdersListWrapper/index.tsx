@@ -69,12 +69,7 @@ const OrdersListWrapper = ({
     );
     const channel = pusher.subscribe(`restaurant-${restaurantId}`);
 
-    channel.bind("order:created", (data: { order: OrderType }) => {
-      console.log("✅ Novo pedido recebido:", data);
-      setOrders((prev) => {
-        if (prev.some((o) => o.id === data.order.id)) return prev;
-        return [data.order, ...prev];
-      });
+    channel.bind("order:created", () => {
       router.refresh();
     });
 
