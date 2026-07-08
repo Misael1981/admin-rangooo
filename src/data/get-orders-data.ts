@@ -110,9 +110,4 @@ export async function getOrdersData(slug: string, method?: ConsumptionMethod) {
   }));
 
   return { restaurant: safeRestaurant, orders: viewOrders };
-
-  return {
-    restaurant: safeRestaurant,
-    orders: viewOrders,
-  };
 }

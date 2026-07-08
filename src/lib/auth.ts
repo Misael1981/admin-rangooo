@@ -35,15 +35,11 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // src/lib/auth.ts
-
     async signIn({ user, account }) {
-      // 1. Se for Google, a gente confia no e-mail
       if (account?.provider === "google") {
         return true;
       }
 
-      // 2. Se você quiser restringir apenas a quem já está no banco:
       const userExists = await db.user.findUnique({
         where: { email: user.email! },
       });
@@ -79,14 +75,13 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    // Removi o redirect manual pra deixar o NextAuth lidar com o baseUrl padrão
   },
   pages: {
     signIn: "/",
-    error: "/auth/error", // Garanta que essa página exista para você ver o erro real
+    error: "/auth/error",
   },
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET, // CERTIFIQUE-SE QUE ISSO ESTÁ NA VERCEL
+  secret: process.env.NEXTAUTH_SECRET,
 };
